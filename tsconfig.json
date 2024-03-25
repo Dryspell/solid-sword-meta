@@ -10,11 +10,14 @@
 		"allowJs": true,
 		"noEmit": true,
 		"strict": true,
-		"types": ["vinxi/client", "vite/client"],
+		"types": [
+      "vinxi/client", 
+    "vite/client"],
 		"isolatedModules": true,
 		"paths": {
       "~/*": ["./src/*"]
     },
     "typeRoots": ["./node_modules/@types/", "./types", "./node_modules"],
+     "plugins": [{ "name": "typescript-plugin-css-modules" }]
 	}
 }
