@@ -1,32 +1,49 @@
-# SolidStart
+## What is this?
 
-Everything you need to build a Solid project, powered by [`solid-start`](https://start.solidjs.com);
+This is a demo project showing how to host and develop [ExcaliburJS](https://excaliburjs.com/docs/) games on a SolidStart site.
 
-## Creating a project
+## Breakout
 
-```bash
-# create a new project in the current directory
-npm init solid@latest
+[Breakout](<https://en.wikipedia.org/wiki/Breakout_(video_game)>) is an old game from 1976 and serves as the "Hello World" [project](https://excaliburjs.com/docs/getting-started) for ExcaliburJS.
 
-# create a new project in my-app
-npm init solid@latest my-app
+## Breakout UI
+
+The Breakout HelloWorld does not have any UI elements to go with it and it is not obvious to an _Excalibur_ newcomer how to implement UI that can hook into the game loop and game state. This sample code is intended to provide an example of how to do that using commonplace SolidJS JSX.
+
+### How does this UI hook into the game state?
+
+Compared to the NextJS version using React, the SolidJS version is much less complicated, owing mostly to the fact that the reactive Signals native to solid don't require us to run the "render" function many times. Solid by nature has granular updates and doesn't need to diff the DOM the way React does.
+
+```typescript
+const [gameState, setGameState] = createSignal({ score: 0, lives: 3 });
+
+// ...
+
+render(
+ () => (
+  <UI
+   gameState={gameState}
+   setGameState={setGameState}
+   game={game}
+   actions={{ generateRandomBrick }}
+  />
+ ),
+ document.getElementById(gameUiId)!
+);
 ```
 
-## Developing
+Here everything just seems to work smoothly with the biggest difference being due to the differences between SolidJS and React. Since Solid doesn't cause re-renders, we don't need to worry about potentially blowing out the DOM and losing state.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## Getting Started
 
-```bash
-npm run dev
+Clone the repo, run
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+```shell
+pnpm i
 ```
 
-## Building
+then run
 
-Solid apps are built with _presets_, which optimise your project for deployment to different environments.
-
-By default, `npm run build` will generate a Node app that you can run with `npm start`. To use a different preset, add it to the `devDependencies` in `package.json` and specify in your `app.config.js`.
-
-## This project was created with the [Solid CLI](https://solid-cli.netlify.app)
+```shell
+pnpm run dev
+```

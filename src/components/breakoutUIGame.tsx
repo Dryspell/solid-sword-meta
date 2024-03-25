@@ -241,33 +241,10 @@ export const intializeGame = (gameCanvasId: string, gameUiId: string) => {
 
 	const [gameState, setGameState] = createSignal({ score: 0, lives: 3 });
 
-	// const ui = createRoot(uiRoot);
-
-	// const [gameState, setGameState] = createSignal({ score: 0, lives: 3 }, [
-	// 	(state, setState) => {
-	// 		ui.render(
-	// 			<UI
-	// 				gameState={state}
-	// 				setGameState={setState}
-	// 				game={game}
-	// 				actions={{ generateRandomBrick }}
-	// 			/>
-	// 		);
-	// 	},
-	// ]);
-
-	// ui.render(
-	// 	<UI
-	// 		gameState={gameState()}
-	// 		setGameState={setGameState}
-	// 		game={game}
-	// 		actions={{ generateRandomBrick }}
-	// 	/>
-	// );
-
 	const ball = initializeBall(game, gameState, setGameState, bricks);
 
 	game?.start().catch((e) => console.error(e));
+
 	render(
 		() => (
 			<UI
