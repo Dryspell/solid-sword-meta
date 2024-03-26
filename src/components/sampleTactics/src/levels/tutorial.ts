@@ -1,234 +1,261 @@
-import * as ex from 'excalibur';
-import { LevelBase, LevelData } from './level-base';
-import { SCALE } from '../config';
-import { Resources, TutorialTextSheet } from '../resources';
-import { HumanPlayer } from '../human-player';
+import * as ex from "excalibur";
+import { LevelBase, LevelData } from "./level-base";
+import { SCALE } from "../config";
+import { Resources, TutorialTextSheet } from "../resources";
+import { HumanPlayer } from "../human-player";
 
 export const TutorialData: LevelData = {
-    name: 'tutorial',
-    displayName: 'Gentle Plains',
-    nextLevel: 'level1',
-    width: 6,
-    height: 3,
-    maxTurns: 10,
-    players: ['human', 'computer'],
-    data: [
-        'GK1', 'G', 'G', 'GS2', 'G', 'GS2',
-        'GK1', 'G', 'GS2', 'G', 'G', 'GS2',
-        'G', 'G', 'W', 'W', 'G', 'G',
-    ]
-}
+	name: "tutorial",
+	displayName: "Gentle Plains",
+	nextLevel: "level1",
+	width: 6,
+	height: 3,
+	maxTurns: 10,
+	players: ["human", "computer"],
+	data: [
+		"GK1",
+		"G",
+		"G",
+		"GS2",
+		"G",
+		"GS2",
+		"GK1",
+		"G",
+		"GS2",
+		"G",
+		"G",
+		"GS2",
+		"G",
+		"G",
+		"W",
+		"W",
+		"G",
+		"G",
+	],
+};
 export class Tutorial extends LevelBase {
-    focus!: ex.Actor;
-    tutorialDirections!: ex.Actor;
-    private bottomScreen = ex.vec(400, 2000);
-    private centerScreen = ex.vec(400, 700);
-    constructor() {
-        super(TutorialData, 'tutorial');
-    }
-    
-    onInitialize(engine: ex.Engine): void {
-        super.onInitialize(engine);
-        this.input.keyboard.on('press', evt => {
-            if (evt.key === ex.Keys.S) {
-                this.engine.goToScene('level1');
-            }
-        });
-        this.input.pointers.on('down', evt => {
-            this.engine.goToScene('level1');
-        });
-        this.resetAndLoad();
-        const unit = this.board.cells[0].unit;
-        if (unit) {
-            this.focus = new ex.Actor({
-                name: 'focus',
-                pos: unit.pos.add(ex.vec(16, 16).scale(SCALE)),
-                width: 32,
-                height: 32,
-                anchor: ex.vec(0, 1),
-                z: 10
-            });
-            this.focus.graphics.opacity = 0;
-            this.engine.add(this.focus);
-        }
-        const screenWidth = engine.screen.resolution.width;
-        const tutorialDirections = new ex.Text({
-            text: `S or Tap to Skip!`,
-            font: new ex.Font({
-                family: 'notjamslab14',
-                size: 16,
-                unit: ex.FontUnit.Px,
-                color: ex.Color.White,
-                baseAlign: ex.BaseAlign.Top,
-                quality: 2
-            }),
-        });
-        tutorialDirections.scale = SCALE;
+	focus!: ex.Actor;
+	tutorialDirections!: ex.Actor;
+	private bottomScreen = ex.vec(400, 2000);
+	private centerScreen = ex.vec(400, 700);
+	constructor() {
+		super(TutorialData, "tutorial");
+	}
 
-        this.tutorialDirections = new ex.Actor({
-            name: 'directions',
-            pos: this.bottomScreen,
-            coordPlane: ex.CoordPlane.Screen,
-            color: new ex.Color(50, 240, 50, .4),
-            width: screenWidth,
-            height: 100,
-            z: 10
-        });
-        // this.tutorialDirections.graphics.opacity = 0;
-        this.tutorialDirections.graphics.add('text', tutorialDirections);
-        this.tutorialDirections.graphics.show('text')
-        engine.add(this.tutorialDirections);
-    }
+	onInitialize(engine: ex.Engine): void {
+		super.onInitialize(engine);
+		this.input.keyboard.on("press", (evt) => {
+			if (evt.key === ex.Keys.S) {
+				this.engine.goToScene("level1");
+			}
+		});
+		this.input.pointers.on("down", (evt) => {
+			this.engine.goToScene("level1");
+		});
+		this.resetAndLoad();
+		const unit = this.board.cells[0].unit;
+		if (unit) {
+			this.focus = new ex.Actor({
+				name: "focus",
+				pos: unit.pos.add(ex.vec(16, 16).scale(SCALE)),
+				width: 32,
+				height: 32,
+				anchor: ex.vec(0, 1),
+				z: 10,
+			});
+			this.focus.graphics.opacity = 0;
+			this.engine.add(this.focus);
+		}
+		const screenWidth = engine.screen.resolution.width;
+		const tutorialDirections = new ex.Text({
+			text: `S or Tap to Skip!`,
+			font: new ex.Font({
+				family: "notjamslab14",
+				size: 16,
+				unit: ex.FontUnit.Px,
+				color: ex.Color.White,
+				baseAlign: ex.BaseAlign.Top,
+				quality: 2,
+			}),
+		});
+		tutorialDirections.scale = SCALE;
 
-    async showSkip() {
-        const transitionTime = 1200;
-        await this.tutorialDirections.actions.easeTo(this.centerScreen, transitionTime, ex.EasingFunctions.EaseInOutCubic).toPromise();
-    }
+		this.tutorialDirections = new ex.Actor({
+			name: "directions",
+			pos: this.bottomScreen,
+			coordPlane: ex.CoordPlane.Screen,
+			color: new ex.Color(50, 240, 50, 0.4),
+			width: screenWidth,
+			height: 100,
+			z: 10,
+		});
+		// this.tutorialDirections.graphics.opacity = 0;
+		this.tutorialDirections.graphics.add("text", tutorialDirections);
+		this.tutorialDirections.graphics.show("text");
+		engine.add(this.tutorialDirections);
+	}
 
-    async moveToUnit1() {
-        const pos = this.board.getCell(0, 0)!.unit!.pos.add(ex.vec(16, 16).scale(SCALE));
-        await this.focus.actions.easeTo(pos, 1000, ex.EasingFunctions.EaseInOutCubic).toPromise();
-    }
+	async showSkip() {
+		const transitionTime = 1200;
+		await this.tutorialDirections.actions
+			.easeTo(
+				this.centerScreen,
+				transitionTime,
+				ex.EasingFunctions.EaseInOutCubic
+			)
+			.toPromise();
+	}
 
-    async selectUnit1() {
-        this.selectionManager.selectPlayer(this.players[0]);
-        const unit1 = this.board.getCell(0, 0)!.unit!;
-        const menu = this.uiManager.showUnitMenu(unit1, {
-            move: () => {},
-            attack: () => {},
-            pass: () => { }
-        });
-        await ex.Util.delay(1000);
+	async moveToUnit1() {
+		const pos = this.board
+			.getCell(0, 0)!
+			.unit!.pos.add(ex.vec(16, 16).scale(SCALE));
+		await this.focus.actions
+			.easeTo(pos, 1000, ex.EasingFunctions.EaseInOutCubic)
+			.toPromise();
+	}
 
-        menu.hide();
+	async selectUnit1() {
+		this.selectionManager.selectPlayer(this.players[0]);
+		const unit1 = this.board.getCell(0, 0)!.unit!;
+		const menu = this.uiManager.showUnitMenu(unit1, {
+			move: () => {},
+			attack: () => {},
+			pass: () => {},
+		});
+		await ex.Util.delay(1000);
 
-        this.selectionManager.selectUnit(unit1, 'move');
+		menu.hide();
 
-        const currentRange = this.selectionManager.findMovementRange(unit1);
-        const cell = this.board.getCell(2, 0)
-        const currentPath = this.selectionManager.findPath(cell!, currentRange);
-        this.selectionManager.showHighlight(currentPath, 'path');
-        
-        await ex.Util.delay(1000);
+		this.selectionManager.selectUnit(unit1, "move");
 
-        await this.selectionManager.selectDestinationAndMove(unit1, cell!);
+		const currentRange = this.selectionManager.findMovementRange(unit1);
+		const cell = this.board.getCell(2, 0);
+		const currentPath = this.selectionManager.findPath(cell!, currentRange);
+		this.selectionManager.showHighlight(currentPath, "path");
 
-        menu.show();
+		await ex.Util.delay(1000);
 
-        await ex.Util.delay(2000);
+		await this.selectionManager.selectDestinationAndMove(unit1, cell!);
 
-        this.selectionManager.selectUnit(unit1, 'attack');
-        const currentAttackRange = this.selectionManager.findAttackRange(unit1);
-        this.selectionManager.showHighlight(currentAttackRange, 'attack');
+		menu.show();
 
-        await ex.Util.delay(1000);
+		await ex.Util.delay(2000);
 
-        const attackCell = this.board.getCell(2, 1);
-        this.selectionManager.showHighlight([attackCell!.pathNode], "path");
+		this.selectionManager.selectUnit(unit1, "attack");
+		const currentAttackRange = this.selectionManager.findAttackRange(unit1);
+		this.selectionManager.showHighlight(currentAttackRange, "attack");
 
-        menu.hide();
-        this.selectionManager.reset();
+		await ex.Util.delay(1000);
 
-        const enemy = this.board.getCell(2, 1)!.unit!;
+		const attackCell = this.board.getCell(2, 1);
+		this.selectionManager.showHighlight([attackCell!.pathNode], "path");
 
-        unit1.attack(enemy);
+		menu.hide();
+		this.selectionManager.reset();
 
-        await ex.Util.delay(2000);
-    }
+		const enemy = this.board.getCell(2, 1)!.unit!;
 
-    async highlightEnemyRange() {
-        const humanPlayer = this.players[0] as HumanPlayer;
-        const enemyCell = this.board.getCell(2, 1);
-        await humanPlayer.highlightUnitRange(enemyCell);
+		unit1.attack(enemy);
 
-        await ex.Util.delay(1000);
-        this.selectionManager.reset();
-    }
+		await ex.Util.delay(2000);
+	}
 
-    async moveToUnit2() {
-        const pos = this.board.getCell(0, 1)!.unit!.pos.add(ex.vec(16, 16).scale(SCALE));
-        await this.focus.actions.easeTo(pos, 1000, ex.EasingFunctions.EaseInOutCubic).toPromise();
-    }
+	async highlightEnemyRange() {
+		const humanPlayer = this.players[0] as HumanPlayer;
+		const enemyCell = this.board.getCell(2, 1);
+		await humanPlayer.highlightUnitRange(enemyCell);
 
-    async showText(index: number) {
-        const text = TutorialTextSheet.getSprite(index, 0) as ex.Sprite;
-        text.scale = SCALE;
-        this.focus.graphics.use(text);
-        this.focus.graphics.opacity = 1;
-        await ex.Util.delay(1000);
-        // await this.focus.actions.fade(1, 200).toPromise();
-    }
+		await ex.Util.delay(1000);
+		this.selectionManager.reset();
+	}
 
-    async hideText() {
-        this.focus.graphics.opacity = 0;
-        await ex.Util.delay(1000);
-        // await this.focus.actions.fade(0, 200).toPromise();
-    }
+	async moveToUnit2() {
+		const pos = this.board
+			.getCell(0, 1)!
+			.unit!.pos.add(ex.vec(16, 16).scale(SCALE));
+		await this.focus.actions
+			.easeTo(pos, 1000, ex.EasingFunctions.EaseInOutCubic)
+			.toPromise();
+	}
 
-    private _subs: ex.Subscription[] = [];
-    async onActivate() {
-        this.showSkip();
-        console.log('activate tutorial');
-        
+	async showText(index: number) {
+		const text = TutorialTextSheet.getSprite(index, 0) as ex.Sprite;
+		text.scale = SCALE;
+		this.focus.graphics.use(text);
+		this.focus.graphics.opacity = 1;
+		await ex.Util.delay(1000);
+		// await this.focus.actions.fade(1, 200).toPromise();
+	}
 
-        Resources.LevelMusic2.loop = true;
-        Resources.LevelMusic2.play();
+	async hideText() {
+		this.focus.graphics.opacity = 0;
+		await ex.Util.delay(1000);
+		// await this.focus.actions.fade(0, 200).toPromise();
+	}
 
-        this.camera.strategy.lockToActor(this.focus)
-        this.camera.zoomOverTime(1.25, 1000, ex.EasingFunctions.EaseInOutCubic);
+	private _subs: ex.Subscription[] = [];
+	async onActivate() {
+		this.showSkip();
+		console.log("activate tutorial");
 
-        this.selectionManager.showCursor(0, 0);
+		Resources.LevelMusic2.loop = true;
+		Resources.LevelMusic2.play();
 
-        await ex.Util.delay(1000);
+		this.camera.strategy.lockToActor(this.focus);
+		this.camera.zoomOverTime(1.25, 1000, ex.EasingFunctions.EaseInOutCubic);
 
-        // hey look at all these spiders!
-        await this.showText(1);
-        await this.focus.actions.delay(1000);
-        await this.hideText();
+		this.selectionManager.showCursor(0, 0);
 
-        // we need to take them out to get home!
-        await this.moveToUnit2();
-        await this.showText(2);
-        await this.focus.actions.delay(1000);
-        await this.hideText();
+		await ex.Util.delay(1000);
 
-        // how do we do that?!?
-        await this.moveToUnit1();
-        await this.showText(3);
-        await this.focus.actions.delay(1000);
-        await this.hideText();
+		// hey look at all these spiders!
+		await this.showText(1);
+		await this.focus.actions.delay(1000);
+		await this.hideText();
 
-        // left click to move/attack, right click to see friendly/enemy range
-        await this.moveToUnit2();
-        await this.showText(4);
-        await this.focus.actions.delay(4000);
-        await this.hideText();
+		// we need to take them out to get home!
+		await this.moveToUnit2();
+		await this.showText(2);
+		await this.focus.actions.delay(1000);
+		await this.hideText();
 
-        await this.selectUnit1();
+		// how do we do that?!?
+		await this.moveToUnit1();
+		await this.showText(3);
+		await this.focus.actions.delay(1000);
+		await this.hideText();
 
-        // we have a limited amount of turns to complete the level!
-        await this.moveToUnit2();
-        await this.showText(5);
-        await this.focus.actions.delay(1000);
-        await this.hideText();
+		// left click to move/attack, right click to see friendly/enemy range
+		await this.moveToUnit2();
+		await this.showText(4);
+		await this.focus.actions.delay(4000);
+		await this.hideText();
 
-        await this.highlightEnemyRange();
+		await this.selectUnit1();
 
-        await this.showText(6);
-        await this.focus.actions.delay(2000);
-        await this.hideText();
+		// we have a limited amount of turns to complete the level!
+		await this.moveToUnit2();
+		await this.showText(5);
+		await this.focus.actions.delay(1000);
+		await this.hideText();
 
-        await this.showText(7);
-        await this.focus.actions.delay(3000);
-        await this.hideText();
+		await this.highlightEnemyRange();
 
-        this.camera.zoomOverTime(1, 1000, ex.EasingFunctions.EaseInOutCubic);
+		await this.showText(6);
+		await this.focus.actions.delay(2000);
+		await this.hideText();
 
-        this.engine.goToScene('level1');
-    }
+		await this.showText(7);
+		await this.focus.actions.delay(3000);
+		await this.hideText();
 
-    onDeactivate(): void {
-        Resources.LevelMusic2.stop();
-    }
+		this.camera.zoomOverTime(1, 1000, ex.EasingFunctions.EaseInOutCubic);
 
+		this.engine.goToScene("level1");
+	}
+
+	onDeactivate(): void {
+		Resources.LevelMusic2.stop();
+	}
 }

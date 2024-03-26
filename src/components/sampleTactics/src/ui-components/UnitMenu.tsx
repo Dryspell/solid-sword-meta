@@ -23,7 +23,9 @@ export default function UnitMenu({
 				<div class={styles.options}>
 					<button
 						class={styles.button}
-						onClick={unitMenuData().move}
+						onClick={() => {
+							unitMenuData().move();
+						}}
 						style={{
 							display: unitMenuData().unit?.canMove()
 								? "block"
@@ -34,7 +36,9 @@ export default function UnitMenu({
 					</button>
 					<button
 						class={styles.button}
-						onClick={unitMenuData().attack}
+						onClick={() => {
+							unitMenuData().attack();
+						}}
 						style={{
 							display: unitMenuData().unit?.canAttack()
 								? "block"
@@ -43,7 +47,12 @@ export default function UnitMenu({
 					>
 						Attack
 					</button>
-					<button class={styles.button} onClick={unitMenuData().pass}>
+					<button
+						class={styles.button}
+						onClick={() => {
+							unitMenuData().pass();
+						}}
+					>
 						Done
 					</button>
 				</div>

@@ -1,20 +1,40 @@
-import { Accessor } from "solid-js";
+import { createSignal } from "solid-js";
+import styles from "./AudioMenu.module.css";
+import { FaSolidVolumeHigh } from "solid-icons/fa";
+import { FaSolidVolumeXmark } from "solid-icons/fa";
 
-export default function AudioMenu(
-	soundOn: Accessor<boolean>,
-	toggleSound: () => void
-) {
+export default function AudioMenu({
+	toggleMute,
+}: {
+	toggleMute: (shouldMute: boolean) => void;
+}) {
+	const [soundOn, setSoundOn] = createSignal(true);
+	const toggleSound = () => {
+		setSoundOn(!soundOn());
+		toggleMute(!soundOn());
+	};
+
+	console.log(styles);
+
 	return (
 		<>
-			{soundOn() ? (
-				<button onClick={toggleSound} class="material-symbols-outlined">
-					volume_up
-				</button>
-			) : (
-				<button onClick={toggleSound} class="material-symbols-outlined">
-					volume_off
-				</button>
-			)}
+			<div class={styles.host}>
+				{soundOn() ? (
+					<button
+						class={`${styles.button} ${styles["materialSymbolsOutlined"]}`}
+						onClick={toggleSound}
+					>
+						<FaSolidVolumeHigh />
+					</button>
+				) : (
+					<button
+						onClick={toggleSound}
+						class={`${styles.button} ${styles["materialSymbolsOutlined"]}`}
+					>
+						<FaSolidVolumeXmark />
+					</button>
+				)}
+			</div>
 		</>
 	);
 }

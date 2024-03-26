@@ -8,9 +8,9 @@ import UnitMenu from "./ui-components/UnitMenu";
 import { gameUiId } from "../Entry";
 
 export interface MenuOptions {
-	move: () => any;
-	attack: () => any;
-	pass: () => any;
+	move: () => void;
+	attack: () => void;
+	pass: () => void;
 }
 
 const defaultMenuOptions: MenuOptions = {
@@ -96,6 +96,8 @@ export class UIManager {
 	}
 
 	showUnitMenu(unit: Unit, options: MenuOptions) {
+		console.log("showUnitMenu", options);
+
 		const pagePos = this.engine.screen.worldToPageCoordinates(unit.pos);
 		this.setUnitMenuData((prev) => ({
 			...prev,
@@ -105,6 +107,21 @@ export class UIManager {
 			unit,
 			...options,
 			worldPos: unit.pos,
+		}));
+		return this;
+	}
+
+	hide() {
+		this.setUnitMenuData((prev) => ({
+			...prev,
+			show: false,
+		}));
+	}
+
+	show() {
+		this.setUnitMenuData((prev) => ({
+			...prev,
+			show: true,
 		}));
 	}
 
