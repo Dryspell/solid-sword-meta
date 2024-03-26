@@ -1,0 +1,83 @@
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(50%);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0%);
+	}
+}
+
+@keyframes fadeOut {
+	from {
+		opacity: 1;
+		transform: translateY(0%);
+	}
+	to {
+		opacity: 0;
+		transform: translateY(50%);
+	}
+}
+
+.menu {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: calc(64px * var(--pixel-conversion));
+	display: none;
+	opacity: 0;
+	flex-direction: column;
+	font-size: calc(8px * var(--pixel-conversion));
+	background-color: rgba(240, 220, 220, 1);
+
+	border: black calc(1px * var(--pixel-conversion)) solid;
+	z-index: 1;
+}
+
+.overlay {
+	position: fixed;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+
+.show {
+	display: flex;
+	opacity: 1;
+	animation: fadeIn 140ms ease normal;
+}
+
+.hide {
+	animation: fadeOut 140ms ease normal;
+}
+
+.options {
+	display: flex;
+	flex-direction: column;
+}
+
+.titleBar {
+	background-color: red;
+	width: 100%;
+	height: calc(7px * var(--pixel-conversion));
+}
+
+button {
+	all: unset;
+	padding: calc(2px * var(--pixel-conversion));
+	padding-left: calc(4px * var(--pixel-conversion));
+	cursor: pointer;
+}
+
+button:focus,
+button:hover,
+.focus {
+	background-color: rgba(220, 200, 200, 1);
+}
+
+button:active,
+.active {
+	background-color: rgba(250, 240, 240, 1);
+}

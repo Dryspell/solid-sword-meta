@@ -18,6 +18,9 @@ export default function Nav() {
 				<li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
 					<a href="/breakout-ui">Breakout with UI</a>
 				</li>
+				<li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
+					<a href="/sample-tactics">Sample Tactics</a>
+				</li>
 			</ul>
 		</nav>
 	);
