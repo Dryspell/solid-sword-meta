@@ -1,9 +1,9 @@
 import { onMount } from "solid-js";
 import initializeGame from "./src/main";
+import AudioMenu from "./src/ui-components/AudioMenu";
 
 export const gameCanvasId = "gameCanvas";
 export const gameUiId = "gameUi";
-export const audioMenuId = "audioMenu";
 
 export default function Game() {
 	onMount(() => {
@@ -25,7 +25,7 @@ export default function Game() {
 				id={gameUiId}
 				// style={{ position: "absolute", display: "flex", width: "100%" }}
 			/>
-			<div id={audioMenuId} />
+			<AudioMenu />
 		</div>
 	);
 }

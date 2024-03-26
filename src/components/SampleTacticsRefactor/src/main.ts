@@ -3,9 +3,7 @@ import { loader } from "./resources";
 import { LevelBase, LevelData } from "./levels/level-base";
 import { StartScreen } from "./levels/start-screen";
 import { Tutorial } from "./levels/tutorial";
-import { AudioManager } from "./audio-manager";
 import { gameCanvasId } from "../Entry";
-import { worldDistanceToPage } from "./ui-components/utils";
 
 const Level1Data: LevelData = {
 	displayName: "Gentle Plains",
@@ -147,8 +145,6 @@ export default function initializeGame() {
 			allow: false,
 		},
 	});
-
-	AudioManager.init();
 
 	const startScreen = new StartScreen();
 	game.addScene("start", startScreen);
