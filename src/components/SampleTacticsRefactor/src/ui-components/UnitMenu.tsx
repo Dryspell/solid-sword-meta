@@ -4,12 +4,6 @@ import { Unit } from "../unit";
 import { getUnitMenuPosition, worldDistanceToPage } from "./utils";
 import { createSignal, onCleanup, Setter } from "solid-js";
 
-export type UnitMenuData = {
-	unit: Unit;
-	game: Engine;
-	menuOptions?: MenuOption[];
-};
-
 export type MenuOption = {
 	key: string;
 	text: string;
@@ -57,7 +51,11 @@ export default function UnitMenu({
 			},
 		},
 	],
-}: UnitMenuData) {
+}: {
+	unit: Unit;
+	game: Engine;
+	menuOptions?: MenuOption[];
+}) {
 	const [unitMenuPosition, setUnitMenuPosition] = createSignal(
 		getUnitMenuPosition(unit, game)
 	);

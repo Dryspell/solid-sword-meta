@@ -6,8 +6,7 @@ import { Cell } from "./cell";
 import { Unit } from "./unit";
 import { Resources } from "./resources";
 import { render } from "solid-js/web";
-import UnitMenu, { MenuOption } from "./ui-components/UnitMenu";
-import { getUnitMenuPosition } from "./ui-components/utils";
+import UnitMenu from "./ui-components/UnitMenu";
 import { gameUiId } from "../Entry";
 
 export class HumanPlayer extends Player {
