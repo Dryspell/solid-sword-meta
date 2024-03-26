@@ -121,12 +121,19 @@ export class Tutorial extends LevelBase {
 	async selectUnit1() {
 		this.selectionManager.selectPlayer(this.players[0]);
 		const unit1 = this.board.getCell(0, 0)!.unit!;
+
 		const menu = {
-			hide: render(
-				() => <UnitMenu unit={unit1} game={this.engine} />,
-				document.getElementById(gameUiId)!
-			),
+			show: () => {
+				const dispose = render(
+					() => <UnitMenu unit={unit1} game={this.engine} />,
+					document.getElementById(gameUiId)!
+				);
+				menu.hide = dispose;
+			},
+			hide: () => {},
 		};
+
+    menu.show();
 
 		await ex.Util.delay(1000);
 
@@ -143,10 +150,7 @@ export class Tutorial extends LevelBase {
 
 		await this.selectionManager.selectDestinationAndMove(unit1, cell!);
 
-		menu.hide = render(
-			() => <UnitMenu unit={unit1} game={this.engine} />,
-			document.getElementById(gameUiId)!
-		);
+		menu.show();
 
 		await ex.Util.delay(2000);
 

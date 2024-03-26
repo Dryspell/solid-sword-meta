@@ -211,7 +211,6 @@ export class HumanPlayer extends Player {
 		// check if the cell clicked has a unit, then select it
 		if (cell?.unit && this.hasPlayerUnitWithActions(cell)) {
 			Resources.SelectSound.play();
-			console.log(`${this.maybeSelectUnit.name}`, cell.unit);
 
 			this.uiManger.showUnitMenu(cell.unit, {
 				move: () => {
