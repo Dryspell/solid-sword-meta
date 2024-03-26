@@ -2,10 +2,13 @@ import * as ex from "excalibur";
 import { Board } from "./board";
 import { Player } from "./player";
 import { SelectionManager } from "./selection-manager";
-import { UIManager } from "./ui-manager";
 import { Cell } from "./cell";
 import { Unit } from "./unit";
 import { Resources } from "./resources";
+import { render } from "solid-js/web";
+import UnitMenu, { MenuOption } from "./ui-components/UnitMenu";
+import { getUnitMenuPosition } from "./ui-components/utils";
+import { gameUiId } from "../Entry";
 
 export class HumanPlayer extends Player {
 	public passed = false;
@@ -15,7 +18,6 @@ export class HumanPlayer extends Player {
 		name: string,
 		private engine: ex.Engine,
 		private selectionManager: SelectionManager,
-		public uiManger: UIManager,
 		board: Board
 	) {
 		super(name, board);
@@ -175,7 +177,6 @@ export class HumanPlayer extends Player {
 
 		if (this.hasWon()) {
 			this.humanMove.resolve();
-			this.uiManger.dismissAll();
 		}
 	}
 
@@ -211,24 +212,57 @@ export class HumanPlayer extends Player {
 		// check if the cell clicked has a unit, then select it
 		if (cell?.unit && this.hasPlayerUnitWithActions(cell)) {
 			Resources.SelectSound.play();
-			console.log(`${this.maybeSelectUnit.name}`, cell.unit);
 
-			this.uiManger.showUnitMenu(cell.unit, {
-				move: () => {
-					this.selectionManager.selectUnit(cell.unit!, "move");
-					this.uiManger.hide();
-				},
-				attack: () => {
-					this.selectionManager.selectUnit(cell.unit!, "attack");
-					this.uiManger.hide();
-				},
-				pass: () => {
-					cell.unit?.pass();
-					this.selectionManager.reset();
-					this.humanMove.resolve();
-					this.uiManger.hide();
-				},
-			});
+			const disposeMenu = render(
+				() => (
+					<UnitMenu
+						unit={cell.unit!}
+						game={this.engine}
+						menuOptions={[
+							{
+								key: "move",
+								text: "Move",
+								onClick: () => {
+									this.selectionManager.selectUnit(
+										cell.unit!,
+										"move"
+									);
+									disposeMenu();
+								},
+							},
+							{
+								key: "attack",
+								text: "Attack",
+								onClick: () => {
+									this.selectionManager.selectUnit(
+										cell.unit!,
+										"attack"
+									);
+									disposeMenu();
+								},
+							},
+							{
+								key: "pass",
+								text: "Pass",
+								onClick: () => {
+									cell.unit?.pass();
+									this.selectionManager.reset();
+									this.humanMove.resolve();
+									disposeMenu();
+								},
+							},
+						].filter((option) =>
+							option.key === "attack"
+								? cell.unit?.canAttack()
+								: option.key === "move"
+								? cell.unit?.canMove()
+								: true
+						)}
+					/>
+				),
+				document.getElementById(gameUiId)!
+			);
+
 			// otherwise clear selection
 		} else {
 			this.selectionManager.reset();

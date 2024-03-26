@@ -3,6 +3,9 @@ import { LevelBase, LevelData } from "./level-base";
 import { SCALE } from "../config";
 import { Resources, TutorialTextSheet } from "../resources";
 import { HumanPlayer } from "../human-player";
+import { render } from "solid-js/web";
+import UnitMenu from "../ui-components/UnitMenu";
+import { gameUiId } from "../../Entry";
 
 export const TutorialData: LevelData = {
 	name: "tutorial",
@@ -118,11 +121,13 @@ export class Tutorial extends LevelBase {
 	async selectUnit1() {
 		this.selectionManager.selectPlayer(this.players[0]);
 		const unit1 = this.board.getCell(0, 0)!.unit!;
-		const menu = this.uiManager.showUnitMenu(unit1, {
-			move: () => {},
-			attack: () => {},
-			pass: () => {},
-		});
+		const menu = {
+			hide: render(
+				() => <UnitMenu unit={unit1} game={this.engine} />,
+				document.getElementById(gameUiId)!
+			),
+		};
+
 		await ex.Util.delay(1000);
 
 		menu.hide();
@@ -138,7 +143,10 @@ export class Tutorial extends LevelBase {
 
 		await this.selectionManager.selectDestinationAndMove(unit1, cell!);
 
-		menu.show();
+		menu.hide = render(
+			() => <UnitMenu unit={unit1} game={this.engine} />,
+			document.getElementById(gameUiId)!
+		);
 
 		await ex.Util.delay(2000);
 

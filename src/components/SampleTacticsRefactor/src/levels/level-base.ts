@@ -6,7 +6,6 @@ import { Unit } from "../unit";
 import { Player } from "../player";
 import { HumanPlayer } from "../human-player";
 import { SelectionManager } from "../selection-manager";
-import { UIManager } from "../ui-manager";
 import { TurnManager } from "../turn-manager";
 import { ComputerPlayer } from "../computer-player";
 import { Cloud } from "../cloud";
@@ -54,7 +53,6 @@ export const CharToUnit = {
 export class LevelBase extends ex.Scene {
 	board!: Board;
 	selectionManager!: SelectionManager;
-	uiManager!: UIManager;
 	engine!: ex.Engine;
 	players!: Player[];
 	turnManager!: TurnManager;
@@ -158,14 +156,12 @@ export class LevelBase extends ex.Scene {
 		const board = new Board(levelData.height, levelData.width, this);
 		this.selectionManager = new SelectionManager(board);
 		this.selectionManager.showCursor(0, 0);
-		this.uiManager = new UIManager(this.engine);
 		// TODO support arbitrary players
 		this.players = [
 			new HumanPlayer(
 				levelData.players[0],
 				this.engine,
 				this.selectionManager,
-				this.uiManager,
 				board
 			),
 			new ComputerPlayer(

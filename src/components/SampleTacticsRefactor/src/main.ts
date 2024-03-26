@@ -5,6 +5,7 @@ import { StartScreen } from "./levels/start-screen";
 import { Tutorial } from "./levels/tutorial";
 import { AudioManager } from "./audio-manager";
 import { gameCanvasId } from "../Entry";
+import { worldDistanceToPage } from "./ui-components/utils";
 
 const Level1Data: LevelData = {
 	displayName: "Gentle Plains",
@@ -132,7 +133,7 @@ export const Level3Data: LevelData = {
 	],
 };
 
-export default function initializeGame () {
+export default function initializeGame() {
 	const game = new ex.Engine({
 		width: 800,
 		height: 800,
@@ -167,4 +168,4 @@ export default function initializeGame () {
 	game.start(loader).then(() => {
 		game.goToScene("start");
 	});
-};
+}
