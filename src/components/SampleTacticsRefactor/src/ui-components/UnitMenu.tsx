@@ -5,7 +5,7 @@ import { getUnitMenuPosition, worldDistanceToPage } from "./utils";
 import { createSignal, onCleanup, Setter } from "solid-js";
 
 export type MenuOption = {
-	key: string;
+	key?: string;
 	text: string;
 	onClick: () => void;
 };
