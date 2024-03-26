@@ -132,7 +132,7 @@ menu.show();
 menu.hide();
 ```
 
-With this syntax, it does feel pretty nice to call the hide and show functions but the reader should understand that calling "show" or "hide" like this actually adds and removes the component from the DOM. If wanting a more persistent DOM element, one should provide props that have static references to values (preferably signals) and updating those values/signals as needed.
+With this syntax, it does feel pretty nice to call the hide and show functions but the reader should understand that calling "show" or "hide" like this actually adds and removes the component from the DOM. If wanting a more persistent DOM element, one should provide props that have static references to values (preferably signals) and updating those values/signals as needed, just as demonstrated with the "Breakout UI" demo.
 
 ## Getting Started
 
