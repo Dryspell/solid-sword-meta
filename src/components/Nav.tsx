@@ -22,7 +22,15 @@ export default function Nav() {
 					<a href="/sample-tactics">Sample Tactics</a>
 				</li>
 				<li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
-					<a href="/sample-tactics-refactor">Sample Tactics Refactor</a>
+					<a href="/sample-tactics-refactor">
+						Sample Tactics Refactor
+					</a>
+				</li>
+				<li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
+					<a href="/drawing">Drawing</a>
+				</li>
+				<li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
+					<a href="/rts">RTS Box</a>
 				</li>
 			</ul>
 		</nav>
