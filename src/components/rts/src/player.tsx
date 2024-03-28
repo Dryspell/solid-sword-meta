@@ -1,21 +1,8 @@
-import {
-	Actor,
-	Animation,
-	Color,
-	Debug,
-	Engine,
-	ImageFiltering,
-	ImageSource,
-	range,
-	Sprite,
-	SpriteSheet,
-	vec,
-} from "excalibur";
+import { Actor, Animation, Engine, range, SpriteSheet } from "excalibur";
 import { Accessor, createEffect, createSignal, Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { gameUiId } from "../Entry";
 import { Resources } from "./resources";
-import { Switch } from "~/components/ui/switch";
 import { Button } from "~/components/ui/button";
 import {
 	DropdownMenu,
@@ -150,7 +137,7 @@ export const createPlayer = async (game: Engine) => {
 	const player = new Actor({
 		name: "player",
 		// pos: vec(game.halfCanvasWidth, game.halfCanvasHeight),
-		x: 1.5 * game.halfCanvasWidth,
+		x: game.halfCanvasWidth,
 		y: game.halfCanvasHeight,
 	});
 
