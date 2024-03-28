@@ -1,11 +1,12 @@
-import { Actor, Color, DisplayMode, Engine, Rectangle, vec } from "excalibur";
+import {
+	DisplayMode,
+	Engine,
+} from "excalibur";
 import { gameCanvasId } from "../Entry";
 import { createSignal } from "solid-js";
-import {
-	drawLine,
-	generateFilledRect,
-	generateSelectionRect,
-} from "./graphicsUtils";
+import { generateSelectionRect } from "./graphicsUtils";
+import { createPlayer } from "./player";
+import { loader } from "./resources";
 
 export default function initializeGame() {
 	const game = new Engine({
@@ -20,7 +21,6 @@ export default function initializeGame() {
 			allow: false,
 		},
 	});
-	game.start();
 
 	const [isDragging, setIsDragging] = createSignal(false);
 
@@ -45,4 +45,9 @@ export default function initializeGame() {
 		setIsDragging(false);
 		unitSelector.selectionRect.graphics.hide();
 	});
+
+	game.start(loader).then(() => {
+		const player = createPlayer(game);
+	});
+	return game;
 }

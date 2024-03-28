@@ -32,6 +32,9 @@ export default function Nav() {
 				<li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
 					<a href="/rts">RTS Box</a>
 				</li>
+				<li class={`border-b-2 ${active("/")} mx-1.5 sm:mx-6`}>
+					<a href="/minimal-sprite">Minimal Sprite</a>
+				</li>
 			</ul>
 		</nav>
 	);
