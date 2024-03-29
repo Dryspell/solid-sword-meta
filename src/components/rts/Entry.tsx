@@ -20,7 +20,13 @@ export default function Game() {
 				height: "90vh",
 			}}
 		>
-			<canvas id={gameCanvasId}></canvas>
+			<canvas
+				id={gameCanvasId}
+				onContextMenu={(e) => {
+					e.preventDefault();
+					return false;
+				}}
+			></canvas>
 			<div id={gameUiId} />
 			{/* <AudioMenu /> */}
 		</div>

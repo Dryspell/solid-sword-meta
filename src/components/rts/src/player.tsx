@@ -1,4 +1,11 @@
-import { Actor, Animation, Engine, range, SpriteSheet } from "excalibur";
+import {
+	Actor,
+	Animation,
+	Engine,
+	range,
+	SpriteSheet,
+	Vector,
+} from "excalibur";
 import { Accessor, createEffect, createSignal, Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { gameUiId } from "../Entry";
@@ -12,105 +19,15 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
+import { Direction, directions, getDirection4 } from "./mathUtils";
+import { Action } from "./playerActions";
+import { ButtonUI } from "./playerUI";
 
-const ButtonUI = ({
-	state,
-	setState,
-}: {
-	state: Accessor<State>;
-	setState: Setter<State>;
-}) => {
-	const buttonStyle = {
-		padding: "1rem",
-		margin: "1rem",
-	};
-
-	return (
-		<div
-			style={{
-				position: "absolute",
-				top: "0px",
-				right: "0px",
-				padding: "1rem",
-			}}
-		>
-			<div>
-				<DropdownMenu>
-					<DropdownMenuTrigger as={Button}>
-						Select Action
-					</DropdownMenuTrigger>
-					<DropdownMenuGroup>
-						<DropdownMenuGroupLabel>Action</DropdownMenuGroupLabel>
-						<DropdownMenuRadioGroup
-							value={state().action}
-							onChange={(value) =>
-								setState((prev) => ({
-									...prev,
-									action: value as "idle" | "walk",
-								}))
-							}
-						>
-							<DropdownMenuRadioItem value="idle">
-								idle
-							</DropdownMenuRadioItem>
-							<DropdownMenuRadioItem value="walk">
-								walk
-							</DropdownMenuRadioItem>
-						</DropdownMenuRadioGroup>
-					</DropdownMenuGroup>
-				</DropdownMenu>
-				<Button
-					style={buttonStyle}
-					onClick={() =>
-						setState((prev) => ({
-							...prev,
-							direction: "up",
-						}))
-					}
-				>
-					Up
-				</Button>
-				<Button
-					style={buttonStyle}
-					onClick={() =>
-						setState((prev) => ({
-							...prev,
-							direction: "down",
-						}))
-					}
-				>
-					Down
-				</Button>
-				<Button
-					style={buttonStyle}
-					onClick={() =>
-						setState((prev) => ({
-							...prev,
-							direction: "left",
-						}))
-					}
-				>
-					Left
-				</Button>
-				<Button
-					style={buttonStyle}
-					onClick={() =>
-						setState((prev) => ({
-							...prev,
-							direction: "right",
-						}))
-					}
-				>
-					Right
-				</Button>
-			</div>
-		</div>
-	);
-};
-
-type State = {
-	direction: "up" | "down" | "left" | "right";
-	action: "idle" | "walk";
+export type State = {
+	direction: Direction;
+	action: Action;
+	destination: Vector;
+	postUpdates: Record<string, () => void>;
 };
 
 const spriteSheet_COLUMNS = 12;
@@ -131,15 +48,26 @@ const spriteSheet = SpriteSheet.fromImageSource({
 });
 
 const WALK_ANIMATION_SPEED = 100;
-const IDLE_ANIMATION_SPEED = 150;
+const IDLE_ANIMATION_SPEED = 200;
 
 export const createPlayer = async (game: Engine) => {
-	const player = new Actor({
+	const actor = new Actor({
 		name: "player",
 		// pos: vec(game.halfCanvasWidth, game.halfCanvasHeight),
 		x: game.halfCanvasWidth,
 		y: game.halfCanvasHeight,
 	});
+
+	const [state, setState] = createSignal<State>({
+		direction: "down",
+		action: "idle",
+		destination: actor.pos.clone(),
+		postUpdates: {},
+	});
+
+	actor.onPostUpdate = (engine: Engine, delta: number) => {
+		Object.values(state().postUpdates).forEach((update) => update());
+	};
 
 	const ANIMATIONS = {
 		walk: {
@@ -188,28 +116,24 @@ export const createPlayer = async (game: Engine) => {
 		},
 	};
 
-	(["up", "left", "down", "right"] as const).forEach((direction) => {
-		player.graphics.add(`walk_${direction}`, ANIMATIONS.walk[direction]);
-		player.graphics.add(`idle_${direction}`, ANIMATIONS.idle[direction]);
+	directions.forEach((direction) => {
+		actor.graphics.add(`walk_${direction}`, ANIMATIONS.walk[direction]);
+		actor.graphics.add(`idle_${direction}`, ANIMATIONS.idle[direction]);
 	});
 
-	const [state, setState] = createSignal<State>({
-		direction: "down",
-		action: "idle",
-	});
-	player.graphics.use(`idle_down`);
+	actor.graphics.use(`idle_down`);
 
 	createEffect(() => {
 		console.log({ state: state() });
-		player.graphics.use(`${state().action}_${state().direction}`);
+		actor.graphics.use(`${state().action}_${state().direction}`);
 	});
 
-	game.add(player);
+	game.add(actor);
 
 	render(
 		() => <ButtonUI state={state} setState={setState} />,
 		document.getElementById(gameUiId)!
 	);
 
-	return player;
+	return { actor, state, setState };
 };
