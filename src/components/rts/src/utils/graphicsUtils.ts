@@ -60,6 +60,15 @@ export const generateFilledRect = (game: Engine) => {
 	return { selectionRect, rect, setDimensions };
 };
 
+export const getDimensions = (selectionRect: Actor, lines: Line[]) => {
+	return {
+		x0: selectionRect.pos.x,
+		y0: selectionRect.pos.y,
+		x1: selectionRect.pos.x + lines[2].start.x,
+		y1: selectionRect.pos.y + lines[2].start.y,
+	};
+};
+
 export const generateSelectionRect = (game: Engine) => {
 	const lines = [
 		new Line({
@@ -127,5 +136,10 @@ export const generateSelectionRect = (game: Engine) => {
 
 	game.add(selectionRect);
 
-	return { selectionRect, rect, setDimensions };
+	return {
+		selectionRect,
+		rect,
+		setDimensions,
+		getDimensions: () => getDimensions(selectionRect, lines),
+	};
 };

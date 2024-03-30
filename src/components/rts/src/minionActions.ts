@@ -1,12 +1,12 @@
 import { Vector } from "excalibur";
-import { createPlayer } from "./player";
-import { getDirection4 } from "./mathUtils";
+import { createMinion } from "./minion";
+import { getDirection4 } from "./utils/mathUtils";
 
 export const actions = ["idle", "walk"] as const;
 export type Action = (typeof actions)[number];
 
 const generatePostUpdateWalk = (
-	player: Awaited<ReturnType<typeof createPlayer>>
+	player: Awaited<ReturnType<typeof createMinion>>
 ) => {
 	return () => {
 		if (player.actor.pos.distance(player.state().destination) < 5) {
@@ -22,7 +22,7 @@ const generatePostUpdateWalk = (
 };
 
 export const handleWalk = (
-	player: Awaited<ReturnType<typeof createPlayer>>,
+	player: Awaited<ReturnType<typeof createMinion>>,
 	destination: Vector
 ) => {
 	const pointerVec = destination.sub(player.actor.pos).normalize();

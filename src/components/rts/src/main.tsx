@@ -1,10 +1,12 @@
 import { DisplayMode, Engine } from "excalibur";
 import { gameCanvasId, gameUiId } from "../Entry";
 import { createSignal } from "solid-js";
-import { generateSelectionRect } from "./graphicsUtils";
-import { createPlayer } from "./player";
+import { generateSelectionRect } from "./utils/graphicsUtils";
+import { createMinion } from "./minion";
 import { loader } from "./resources";
-import { handleWalk } from "./playerActions";
+import { handleWalk } from "./minionActions";
+import { isActor } from "./utils/excaliburUtils";
+import { isWithinRect } from "./utils/mathUtils";
 
 export default function initializeGame() {
 	const game = new Engine({
@@ -21,7 +23,7 @@ export default function initializeGame() {
 	});
 
 	game.start(loader).then(async () => {
-		const player = await createPlayer(game);
+		const player = await createMinion(game);
 
 		const [isDragging, setIsDragging] = createSignal(false);
 
@@ -54,6 +56,14 @@ export default function initializeGame() {
 			if (pointerEvent.button === "Left") {
 				setIsDragging(false);
 				unitSelector.selectionRect.graphics.hide();
+				const selectedActors = game.currentScene.world
+					.queryTags(["selectable"])
+					.entities.filter((ent) => {
+						if (!isActor(ent)) return false;
+						const dimensions = unitSelector.getDimensions();
+						return isWithinRect(ent.pos, dimensions);
+					});
+				console.log({ selectedActors });
 			}
 		});
 

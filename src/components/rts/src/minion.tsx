@@ -6,40 +6,34 @@ import {
 	SpriteSheet,
 	Vector,
 } from "excalibur";
-import { Accessor, createEffect, createSignal, Setter } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import { render } from "solid-js/web";
 import { gameUiId } from "../Entry";
 import { Resources } from "./resources";
-import { Button } from "~/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuGroup,
-	DropdownMenuGroupLabel,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuTrigger,
-} from "~/components/ui/dropdown-menu";
-import { Direction, directions, getDirection4 } from "./mathUtils";
-import { Action } from "./playerActions";
-import { ButtonUI } from "./playerUI";
+import { Direction, directions } from "./utils/mathUtils";
+import { Action } from "./minionActions";
+import { ButtonUI, HealthBarUI } from "./Ui/minionUI";
 
 export type State = {
 	direction: Direction;
 	action: Action;
 	destination: Vector;
 	postUpdates: Record<string, () => void>;
+	pos: Vector;
 };
 
 const spriteSheet_COLUMNS = 12;
 const spriteSheet_ROWS = 21;
+const sprite_WIDTH = 42;
+const sprite_HEIGHT = 56;
 
 const spriteSheet = SpriteSheet.fromImageSource({
 	image: Resources.FemaleCharacterSpriteSheet,
 	grid: {
 		columns: spriteSheet_COLUMNS,
 		rows: spriteSheet_ROWS,
-		spriteWidth: 42,
-		spriteHeight: 56,
+		spriteWidth: sprite_WIDTH,
+		spriteHeight: sprite_HEIGHT,
 	},
 	spacing: {
 		originOffset: { x: 11, y: 12 },
@@ -50,22 +44,28 @@ const spriteSheet = SpriteSheet.fromImageSource({
 const WALK_ANIMATION_SPEED = 100;
 const IDLE_ANIMATION_SPEED = 200;
 
-export const createPlayer = async (game: Engine) => {
+export const createMinion = async (game: Engine) => {
 	const actor = new Actor({
-		name: "player",
 		// pos: vec(game.halfCanvasWidth, game.halfCanvasHeight),
 		x: game.halfCanvasWidth,
 		y: game.halfCanvasHeight,
+		width: sprite_WIDTH,
+		height: sprite_HEIGHT,
 	});
+
+	actor.addTag("minion");
+	actor.addTag("selectable");
 
 	const [state, setState] = createSignal<State>({
 		direction: "down",
 		action: "idle",
 		destination: actor.pos.clone(),
 		postUpdates: {},
+		pos: actor.pos,
 	});
 
 	actor.onPostUpdate = (engine: Engine, delta: number) => {
+		setState((prev) => ({ ...prev }));
 		Object.values(state().postUpdates).forEach((update) => update());
 	};
 
@@ -124,7 +124,6 @@ export const createPlayer = async (game: Engine) => {
 	actor.graphics.use(`idle_down`);
 
 	createEffect(() => {
-		console.log({ state: state() });
 		actor.graphics.use(`${state().action}_${state().direction}`);
 	});
 
@@ -132,6 +131,11 @@ export const createPlayer = async (game: Engine) => {
 
 	render(
 		() => <ButtonUI state={state} setState={setState} />,
+		document.getElementById(gameUiId)!
+	);
+
+	render(
+		() => <HealthBarUI state={state} actor={actor} engine={game} />,
 		document.getElementById(gameUiId)!
 	);
 

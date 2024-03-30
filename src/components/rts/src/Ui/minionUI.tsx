@@ -8,8 +8,10 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { State } from "./player";
-
+import { State } from "../minion";
+import { Progress } from "~/components/ui/progress";
+import { Actor, Engine } from "excalibur";
+import { getUiPosByTopLeft } from "../utils/UiUtils";
 
 export const ButtonUI = ({
 	state,
@@ -32,6 +34,13 @@ export const ButtonUI = ({
 				padding: "1rem",
 			}}
 		>
+			{/* <Button
+				onClick={() => {
+					dispose();
+				}}
+			>
+				Dispose
+			</Button> */}
 			<div>
 				<DropdownMenu>
 					<DropdownMenuTrigger as={Button}>
@@ -102,6 +111,47 @@ export const ButtonUI = ({
 					Right
 				</Button>
 			</div>
+		</div>
+	);
+};
+
+export const HealthBarUI = ({
+	state,
+	actor,
+	engine,
+}: {
+	state: Accessor<State>;
+	actor: Actor;
+	engine: Engine;
+}) => {
+	return (
+		<div
+			style={{
+				position: "absolute",
+				top: `${
+					getUiPosByTopLeft(state().pos, engine).top -
+					2 * actor.height
+					// state().pos.y
+					//getUiPosByTopLeft(actor.pos, engine).top
+				}px`,
+				left: `${
+					getUiPosByTopLeft(state().pos, engine).left -
+					actor.width / 2
+					// state().pos.x
+					// getUiPosByTopLeft(actor.pos, engine).top
+				}px`,
+				border: "1px solid black",
+			}}
+		>
+			{/* <Button>Hello</Button> */}
+			<Progress
+				value={60}
+				minValue={0}
+				maxValue={100}
+				style={{
+					width: `${actor.width}px`,
+				}}
+			/>
 		</div>
 	);
 };

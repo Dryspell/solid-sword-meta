@@ -1,4 +1,5 @@
 import { vec, Vector } from "excalibur";
+import { getDimensions } from "./graphicsUtils";
 
 export const directions = ["up", "right", "down", "left"] as const;
 export type Direction = (typeof directions)[number];
@@ -33,4 +34,16 @@ export const getDirection8 = (pointerVec: Vector) => {
 			8) %
 		8;
 	return index % 2 === 0 ? directions[index / 2] : diagonals[(index - 1) / 2];
+};
+
+export const isWithinRect = (
+	pos: Vector,
+	dimensions: ReturnType<typeof getDimensions>
+) => {
+	return (
+		((pos.x >= dimensions.x0 && pos.x <= dimensions.x1) ||
+			(pos.x <= dimensions.x0 && pos.x >= dimensions.x1)) &&
+		((pos.y >= dimensions.y0 && pos.y <= dimensions.y1) ||
+			(pos.y <= dimensions.y0 && pos.y >= dimensions.y1))
+	);
 };
