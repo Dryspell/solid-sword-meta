@@ -1,5 +1,5 @@
-import { Actor, ActorArgs, Entity } from "excalibur";
-import { Accessor, createEffect, createSignal, Setter } from "solid-js";
+import { Actor, type ActorArgs, type Entity } from "excalibur";
+import { type Accessor, createEffect, createSignal, type Setter } from "solid-js";
 
 export const isSelectable = (entity: Entity): entity is SelectableActor => {
 	return entity instanceof SelectableActor;
@@ -17,7 +17,7 @@ export class SelectableActor extends Actor {
 
 		createEffect(() => {
 			if (this.selected()) {
-				console.log(`Selected`, this);
+				console.log("Selected", this);
 			}
 		});
 

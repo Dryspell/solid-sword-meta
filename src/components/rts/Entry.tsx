@@ -26,7 +26,7 @@ export default function Game() {
 					e.preventDefault();
 					return false;
 				}}
-			></canvas>
+			 />
 			<div id={gameUiId} />
 			{/* <AudioMenu /> */}
 		</div>

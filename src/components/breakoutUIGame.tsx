@@ -1,4 +1,4 @@
-import { Accessor, createSignal, onMount, Setter } from "solid-js";
+import { type Accessor, createSignal, onMount, type Setter } from "solid-js";
 import {
 	Engine,
 	Actor,
@@ -276,10 +276,8 @@ export default function Game() {
 				height: "600px",
 			}}
 		>
-			<canvas id={gameCanvasId}></canvas>
-			<div
-				id={gameUiId}
-			/>
+			<canvas id={gameCanvasId} />
+			<div id={gameUiId} />
 		</div>
 	);
 }

@@ -1,4 +1,4 @@
-import { Actor, Color, Engine, Line, vec, Vector } from "excalibur";
+import { Actor, Color, type Engine, Line, vec, Vector } from "excalibur";
 
 export const drawLine = (
 	game: Engine,

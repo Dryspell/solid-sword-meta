@@ -1,10 +1,10 @@
 import * as ex from "excalibur";
-import { Board } from "./board";
+import { type Board } from "./board";
 import { Player } from "./player";
-import { SelectionManager } from "./selection-manager";
-import { UIManager } from "./ui-manager";
-import { Cell } from "./cell";
-import { Unit } from "./unit";
+import { type SelectionManager } from "./selection-manager";
+import { type UIManager } from "./ui-manager";
+import { type Cell } from "./cell";
+import { type Unit } from "./unit";
 import { Resources } from "./resources";
 
 export class HumanPlayer extends Player {
@@ -30,41 +30,41 @@ export class HumanPlayer extends Player {
 		this.selectionManager.resetHighlight();
 		const currentCursor = this.selectionManager.currentCursor;
 		switch (event.key) {
-			case ex.Keys.ArrowRight:
-			case ex.Keys.D:
-				this.selectionManager.showCursor(
-					currentCursor.x + 1,
-					currentCursor.y
-				);
-				break;
-			case ex.Keys.Left:
-			case ex.Keys.A:
-				this.selectionManager.showCursor(
-					currentCursor.x - 1,
-					currentCursor.y
-				);
-				break;
-			case ex.Keys.Up:
-			case ex.Keys.W:
-				this.selectionManager.showCursor(
-					currentCursor.x,
-					currentCursor.y - 1
-				);
-				break;
-			case ex.Keys.Down:
-			case ex.Keys.D:
-				this.selectionManager.showCursor(
-					currentCursor.x,
-					currentCursor.y + 1
-				);
-				break;
-			case ex.Keys.Enter:
-			case ex.Keys.NumpadEnter:
-				const cell = this.board.getCell(
-					currentCursor.x,
-					currentCursor.y
-				);
-				this.maybeSelectUnit(cell);
+		case ex.Keys.ArrowRight:
+		case ex.Keys.D:
+			this.selectionManager.showCursor(
+				currentCursor.x + 1,
+				currentCursor.y
+			);
+			break;
+		case ex.Keys.Left:
+		case ex.Keys.A:
+			this.selectionManager.showCursor(
+				currentCursor.x - 1,
+				currentCursor.y
+			);
+			break;
+		case ex.Keys.Up:
+		case ex.Keys.W:
+			this.selectionManager.showCursor(
+				currentCursor.x,
+				currentCursor.y - 1
+			);
+			break;
+		case ex.Keys.Down:
+		case ex.Keys.D:
+			this.selectionManager.showCursor(
+				currentCursor.x,
+				currentCursor.y + 1
+			);
+			break;
+		case ex.Keys.Enter:
+		case ex.Keys.NumpadEnter:
+			const cell = this.board.getCell(
+				currentCursor.x,
+				currentCursor.y
+			);
+			this.maybeSelectUnit(cell);
 		}
 	}
 

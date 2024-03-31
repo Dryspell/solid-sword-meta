@@ -1,5 +1,5 @@
 import { Vector } from "excalibur";
-import { Minion } from "./Minion";
+import { type Minion } from "./Minion";
 import { getDirection4 } from "../../utils/mathUtils";
 
 export const actions = ["idle", "walk"] as const;

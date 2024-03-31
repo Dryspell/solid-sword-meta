@@ -1,9 +1,9 @@
 import * as ex from "excalibur";
 import { Board } from "../board";
-import { Terrain } from "../cell";
-import { SCALE, UnitType } from "../config";
+import { type Terrain } from "../cell";
+import { SCALE, type UnitType } from "../config";
 import { Unit } from "../unit";
-import { Player } from "../player";
+import { type Player } from "../player";
 import { HumanPlayer } from "../human-player";
 import { SelectionManager } from "../selection-manager";
 import { UIManager } from "../ui-manager";

@@ -1,8 +1,8 @@
 import * as ex from "excalibur";
 
 import { SCALE } from "./config";
-import { Unit } from "./unit";
-import { Accessor, createSignal, Setter } from "solid-js";
+import { type Unit } from "./unit";
+import { type Accessor, createSignal, type Setter } from "solid-js";
 import { render } from "solid-js/web";
 import UnitMenu from "./ui-components/UnitMenu";
 import { gameUiId } from "../Entry";

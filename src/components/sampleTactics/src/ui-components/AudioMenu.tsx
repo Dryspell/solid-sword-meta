@@ -3,15 +3,13 @@ import styles from "./AudioMenu.module.css";
 import { FaSolidVolumeHigh } from "solid-icons/fa";
 import { FaSolidVolumeXmark } from "solid-icons/fa";
 
-export default function AudioMenu({
-	toggleMute,
-}: {
+export default function AudioMenu(props: {
 	toggleMute: (shouldMute: boolean) => void;
 }) {
 	const [soundOn, setSoundOn] = createSignal(true);
 	const toggleSound = () => {
 		setSoundOn(!soundOn());
-		toggleMute(!soundOn());
+		props.toggleMute(!soundOn());
 	};
 
 	console.log(styles);

@@ -2,8 +2,7 @@ import { Debug, DisplayMode, Engine, vec } from "excalibur";
 import { gameCanvasId } from "../Entry";
 import { isMinion, Minion } from "./components/minion/Minion";
 import { createLoader } from "./resources";
-import { assignDestinations, isWithinRect } from "./utils/mathUtils";
-import { isSelectable } from "./components/SelectableActor";
+import { assignDestinations } from "./utils/mathUtils";
 import { generateSelectionRect } from "./components/UnitSelector";
 
 const PADDING = 50;
@@ -21,9 +20,11 @@ export default function initializeGame() {
 	});
 
 	const loader = createLoader();
+
 	// game.debug.collider.showAll = true;
 	// game.debug.entity.showId = true;
 	// game.toggleDebug();
+
 	game.start(loader).then(async () => {
 		const minions = Array.from({ length: 10 }, (_, i) => {
 			const minion = new Minion({

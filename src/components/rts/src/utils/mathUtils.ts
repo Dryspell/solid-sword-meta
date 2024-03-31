@@ -1,7 +1,7 @@
-import { vec, Vector } from "excalibur";
-import { getDimensions } from "./graphicsUtils";
-import { Minion } from "../components/minion/Minion";
+import { vec, type Vector } from "excalibur";
+import { type Minion } from "../components/minion/Minion";
 import { handleWalk } from "../components/minion/minionActions";
+import { type getDimensions } from "../components/UnitSelector";
 
 export const directions = ["up", "right", "down", "left"] as const;
 export type Direction = (typeof directions)[number];
@@ -19,10 +19,10 @@ export const getDirection4 = (pointerVec: Vector) => {
 	return angle <= Math.PI / 4 && angle >= -Math.PI / 4
 		? "right"
 		: angle >= (3 * -Math.PI) / 4 && angle <= -Math.PI / 4
-		? "up"
-		: angle >= (3 * Math.PI) / 4 || angle <= (3 * -Math.PI) / 4
-		? "left"
-		: "down";
+			? "up"
+			: angle >= (3 * Math.PI) / 4 || angle <= (3 * -Math.PI) / 4
+				? "left"
+				: "down";
 };
 
 export const getDirection8 = (pointerVec: Vector) => {

@@ -20,7 +20,7 @@ export default function Game() {
 				height: "600px",
 			}}
 		>
-			<canvas id={gameCanvasId}></canvas>
+			<canvas id={gameCanvasId} />
 			<div
 				id={gameUiId}
 				// style={{ position: "absolute", display: "flex", width: "100%" }}

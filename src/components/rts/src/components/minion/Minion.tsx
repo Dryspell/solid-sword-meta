@@ -1,27 +1,27 @@
 import {
 	Actor,
-	ActorArgs,
+	type ActorArgs,
 	Animation,
 	Collider,
 	CollisionContact,
 	CollisionType,
-	Engine,
-	Entity,
+	type Engine,
+	type Entity,
 	range,
 	Side,
 	SpriteSheet,
 	vec,
 	Vector,
 } from "excalibur";
-import { Accessor, createEffect, createSignal, Setter } from "solid-js";
+import { type Accessor, createEffect, createSignal, type Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { gameUiId } from "../../../Entry";
 import { Resources } from "../../resources";
-import { Direction, directions } from "../../utils/mathUtils";
-import { Action } from "./minionActions";
+import { type Direction, directions } from "../../utils/mathUtils";
+import { type Action } from "./minionActions";
 import { SelectableActor } from "../SelectableActor";
 import { DestinationIndicator } from "./DestinationIndicator";
-import { HealthBarUI } from "./minionUI";
+import { HealthBarUI } from "./HealthBarUI";
 
 const spriteSheet_COLUMNS = 12;
 const spriteSheet_ROWS = 21;
@@ -159,7 +159,7 @@ export class Minion extends SelectableActor {
 			);
 		});
 
-		this.graphics.use(`idle_down`);
+		this.graphics.use("idle_down");
 	}
 
 	onInitialize(engine: Engine<any>): void {

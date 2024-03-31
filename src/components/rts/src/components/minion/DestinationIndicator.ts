@@ -1,16 +1,6 @@
-import {
-	Actor,
-	Circle,
-	Color,
-	Engine,
-	GraphicsGroup,
-	Line,
-	Rectangle,
-	vec,
-	Vector,
-} from "excalibur";
-import { Accessor, createEffect, createSignal } from "solid-js";
-import { State } from "./Minion";
+import { Actor, Circle, Color, type Engine, Line, Vector } from "excalibur";
+import { type Accessor, createEffect } from "solid-js";
+import { type State } from "./Minion";
 
 export class DestinationIndicator extends Actor {
 	lineGraphic: Line;

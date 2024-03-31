@@ -1,10 +1,8 @@
-import { Accessor } from "solid-js";
-import { UnitMenuData } from "../ui-manager";
+import { type Accessor } from "solid-js";
+import { type UnitMenuData } from "../ui-manager";
 import styles from "./UnitMenu.module.css";
 
-export default function UnitMenu({
-	unitMenuData,
-}: {
+export default function UnitMenu(props: {
 	unitMenuData: Accessor<UnitMenuData>;
 }) {
 	return (
@@ -12,11 +10,11 @@ export default function UnitMenu({
 			{/* <div class={styles.overlay}></div> */}
 			<div
 				class={`${styles.menu} ${
-					unitMenuData().show ? styles.show : ""
+					props.unitMenuData().show ? styles.show : ""
 				}`}
 				style={{
-					left: `${unitMenuData().left}px`,
-					top: `${unitMenuData().top}px`,
+					left: `${props.unitMenuData().left}px`,
+					top: `${props.unitMenuData().top}px`,
 				}}
 			>
 				<div class={styles.titleBar}></div>
@@ -24,10 +22,10 @@ export default function UnitMenu({
 					<button
 						class={styles.button}
 						onClick={() => {
-							unitMenuData().move();
+							props.unitMenuData().move();
 						}}
 						style={{
-							display: unitMenuData().unit?.canMove()
+							display: props.unitMenuData().unit?.canMove()
 								? "block"
 								: "none",
 						}}
@@ -37,10 +35,10 @@ export default function UnitMenu({
 					<button
 						class={styles.button}
 						onClick={() => {
-							unitMenuData().attack();
+							props.unitMenuData().attack();
 						}}
 						style={{
-							display: unitMenuData().unit?.canAttack()
+							display: props.unitMenuData().unit?.canAttack()
 								? "block"
 								: "none",
 						}}
@@ -50,7 +48,7 @@ export default function UnitMenu({
 					<button
 						class={styles.button}
 						onClick={() => {
-							unitMenuData().pass();
+							props.unitMenuData().pass();
 						}}
 					>
 						Done

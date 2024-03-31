@@ -1,4 +1,4 @@
-import { Actor, Engine, vec, Vector } from "excalibur";
+import { Actor, type Engine, vec, Vector } from "excalibur";
 export const SCALE = vec(3, 3);
 
 export function worldDistanceToPage(distance: number, engine: Engine) {

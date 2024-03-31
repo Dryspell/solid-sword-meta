@@ -1,13 +1,8 @@
-import { GameState } from "./breakoutUIGame";
-import { Engine } from "excalibur";
-import { Accessor, createSignal, Setter } from "solid-js";
+import { type GameState } from "./breakoutUIGame";
+import { type Engine } from "excalibur";
+import { type Accessor, createSignal, type Setter } from "solid-js";
 
-export default function UI({
-	gameState,
-	setGameState,
-	game,
-	actions,
-}: {
+export default function UI(props: {
 	gameState: Accessor<GameState>;
 	setGameState: Setter<GameState>;
 	game: Engine;
@@ -28,13 +23,13 @@ export default function UI({
 						border: "none",
 					}}
 					onClick={() => {
-						setGameState((prev) => ({
+						props.setGameState((prev) => ({
 							...prev,
 							score: prev.score + 1,
 						}));
 					}}
 				>
-					{`Score: ${gameState().score}`}
+					{`Score: ${props.gameState().score}`}
 				</button>
 				<button
 					style={{
@@ -45,13 +40,13 @@ export default function UI({
 						border: "none",
 					}}
 					onClick={() => {
-						setGameState((prev) => ({
+						props.setGameState((prev) => ({
 							...prev,
 							lives: prev.lives - 1,
 						}));
 					}}
 				>
-					{`Lives: ${gameState().lives}`}
+					{`Lives: ${props.gameState().lives}`}
 				</button>
 
 				<div>
@@ -77,7 +72,7 @@ export default function UI({
 						border: "none",
 					}}
 					onClick={() => {
-						actions.generateRandomBrick();
+						props.actions.generateRandomBrick();
 					}}
 				>
 					Generate Brick

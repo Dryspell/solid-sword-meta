@@ -1,8 +1,8 @@
 import * as ex from "excalibur";
-import { LevelBase, LevelData } from "./level-base";
+import { LevelBase, type LevelData } from "./level-base";
 import { SCALE } from "../config";
 import { Resources, TutorialTextSheet } from "../resources";
-import { HumanPlayer } from "../human-player";
+import { type HumanPlayer } from "../human-player";
 
 export const TutorialData: LevelData = {
 	name: "tutorial",
@@ -68,7 +68,7 @@ export class Tutorial extends LevelBase {
 		}
 		const screenWidth = engine.screen.resolution.width;
 		const tutorialDirections = new ex.Text({
-			text: `S or Tap to Skip!`,
+			text: "S or Tap to Skip!",
 			font: new ex.Font({
 				family: "notjamslab14",
 				size: 16,

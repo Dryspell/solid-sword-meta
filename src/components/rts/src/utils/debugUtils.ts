@@ -1,4 +1,4 @@
-import { Actor, Engine, Loader, SpriteSheet, vec } from "excalibur";
+import { Actor, type Engine, Loader, type SpriteSheet, vec } from "excalibur";
 
 export function showSpriteSheet(
 	game: Engine,

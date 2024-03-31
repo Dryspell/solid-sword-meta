@@ -1,6 +1,6 @@
 import * as ex from "excalibur";
 import { loader } from "./resources";
-import { LevelBase, LevelData } from "./levels/level-base";
+import { LevelBase, type LevelData } from "./levels/level-base";
 import { StartScreen } from "./levels/start-screen";
 import { Tutorial } from "./levels/tutorial";
 import { AudioManager } from "./audio-manager";
@@ -132,7 +132,7 @@ export const Level3Data: LevelData = {
 	],
 };
 
-export default function initializeGame () {
+export default function initializeGame() {
 	const game = new ex.Engine({
 		width: 800,
 		height: 800,
@@ -167,4 +167,4 @@ export default function initializeGame () {
 	game.start(loader).then(() => {
 		game.goToScene("start");
 	});
-};
+}

@@ -29,6 +29,11 @@
       {
         "name": "typescript-plugin-css-modules"
       }
-    ]
-  }
+    ],
+  },
+  "include": [
+    ".eslintrc.cjs",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+  ]
 }

@@ -20,7 +20,7 @@ export default function Game() {
 				height: "80vh",
 			}}
 		>
-			<canvas id={gameCanvasId}></canvas>
+			<canvas id={gameCanvasId} />
 			<div id={gameUiId} />
 			{/* <AudioMenu /> */}
 		</div>

@@ -1,7 +1,7 @@
 import {
 	Actor,
 	Color,
-	Engine,
+	type Engine,
 	GraphicsGroup,
 	Line,
 	vec,
