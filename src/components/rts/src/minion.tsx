@@ -1,18 +1,23 @@
 import {
 	Actor,
+	ActorArgs,
 	Animation,
+	CollisionType,
 	Engine,
+	Entity,
 	range,
 	SpriteSheet,
+	vec,
 	Vector,
 } from "excalibur";
-import { createEffect, createSignal } from "solid-js";
+import { Accessor, createEffect, createSignal, Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { gameUiId } from "../Entry";
 import { Resources } from "./resources";
 import { Direction, directions } from "./utils/mathUtils";
 import { Action } from "./minionActions";
 import { ButtonUI, HealthBarUI } from "./Ui/minionUI";
+import { SelectableActor } from "./selectableActor";
 
 export type State = {
 	direction: Direction;
@@ -26,8 +31,9 @@ const spriteSheet_COLUMNS = 12;
 const spriteSheet_ROWS = 21;
 const sprite_WIDTH = 42;
 const sprite_HEIGHT = 56;
+const sprite_MARGIN = { x: 22, y: 8 };
 
-const spriteSheet = SpriteSheet.fromImageSource({
+const defaultSpriteSheet = SpriteSheet.fromImageSource({
 	image: Resources.FemaleCharacterSpriteSheet,
 	grid: {
 		columns: spriteSheet_COLUMNS,
@@ -37,24 +43,157 @@ const spriteSheet = SpriteSheet.fromImageSource({
 	},
 	spacing: {
 		originOffset: { x: 11, y: 12 },
-		margin: { x: 22, y: 8 },
+		margin: sprite_MARGIN,
 	},
 });
 
 const WALK_ANIMATION_SPEED = 100;
 const IDLE_ANIMATION_SPEED = 200;
 
-export const createMinion = async (game: Engine) => {
-	const actor = new Actor({
+const ANIMATIONS = (spriteSheet: SpriteSheet = defaultSpriteSheet) => ({
+	walk: {
+		up: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(8 * 12, 8 * 12 + 8),
+			WALK_ANIMATION_SPEED
+		),
+		left: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(9 * 12, 9 * 12 + 8),
+			WALK_ANIMATION_SPEED
+		),
+		down: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(10 * 12, 10 * 12 + 8),
+			WALK_ANIMATION_SPEED
+		),
+		right: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(11 * 12, 11 * 12 + 8),
+			WALK_ANIMATION_SPEED
+		),
+	},
+	idle: {
+		up: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(8 * 12, 8 * 12 + 1),
+			IDLE_ANIMATION_SPEED
+		),
+		left: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(9 * 12, 9 * 12 + 1),
+			IDLE_ANIMATION_SPEED
+		),
+		down: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(10 * 12, 10 * 12 + 1),
+			IDLE_ANIMATION_SPEED
+		),
+		right: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(11 * 12, 11 * 12 + 1),
+			IDLE_ANIMATION_SPEED
+		),
+	},
+});
+
+export const isMinion = (entity: Entity): entity is Minion =>
+	entity instanceof Minion;
+
+export class Minion extends SelectableActor {
+	state: Accessor<State>;
+	setState: Setter<State>;
+
+	constructor(
+		config: { pos: Vector } & ActorArgs,
+		spriteData?: {
+			spriteSheet?: SpriteSheet;
+			spriteWidth?: number;
+			spriteHeight?: number;
+			spriteMargin?: { x: number; y: number };
+		}
+	) {
+		super({
+			...config,
+			width: spriteData?.spriteWidth ?? sprite_WIDTH,
+			height:
+				spriteData?.spriteHeight ??
+				sprite_HEIGHT +
+					(spriteData?.spriteMargin?.y ?? sprite_MARGIN.y),
+		});
+		this.addTag("minion");
+    this.body.collisionType = CollisionType.Active;
+
+		const [state, setState] = createSignal<State>({
+			direction: "down",
+			action: "idle",
+			destination:
+				config.pos?.clone() ??
+				((config?.x && config?.y && vec(config.x, config.y)) ||
+					vec(0, 0)),
+			postUpdates: {},
+			pos:
+				config.pos?.clone() ??
+				((config?.x && config?.y && vec(config.x, config.y)) ||
+					vec(0, 0)),
+		});
+		this.state = state;
+		this.setState = setState;
+
+		directions.forEach((direction) => {
+			this.graphics.add(
+				`walk_${direction}`,
+				ANIMATIONS(spriteData?.spriteSheet).walk[direction]
+			);
+			this.graphics.add(
+				`idle_${direction}`,
+				ANIMATIONS(spriteData?.spriteSheet).idle[direction]
+			);
+		});
+
+		this.graphics.use(`idle_down`);
+	}
+
+	onInitialize(engine: Engine<any>): void {
+		super.onInitialize(engine);
+		render(
+			() => (
+				<HealthBarUI state={this.state} actor={this} engine={engine} />
+			),
+			document.getElementById(gameUiId)!
+		);
+	}
+
+	onPostUpdate(engine: Engine, delta: number) {
+		super.onPostUpdate(engine, delta);
+
+		this.graphics.use(`${this.state().action}_${this.state().direction}`);
+		this.setState((prev) => ({ ...prev, pos: this.pos }));
+
+		Object.values(this.state().postUpdates).forEach((update) => update());
+	}
+}
+
+export const createMinion = async (
+	game: Engine,
+	spriteData?: {
+		spriteSheet?: SpriteSheet;
+		spriteWidth?: number;
+		spriteHeight?: number;
+		spriteMargin?: { x: number; y: number };
+	}
+) => {
+	const actor = new SelectableActor({
 		// pos: vec(game.halfCanvasWidth, game.halfCanvasHeight),
 		x: game.halfCanvasWidth,
 		y: game.halfCanvasHeight,
-		width: sprite_WIDTH,
-		height: sprite_HEIGHT,
+		width: spriteData?.spriteWidth ?? sprite_WIDTH,
+		height:
+			spriteData?.spriteHeight ??
+			sprite_HEIGHT + (spriteData?.spriteMargin?.y ?? sprite_MARGIN.y),
 	});
 
 	actor.addTag("minion");
-	actor.addTag("selectable");
 
 	const [state, setState] = createSignal<State>({
 		direction: "down",
@@ -69,56 +208,15 @@ export const createMinion = async (game: Engine) => {
 		Object.values(state().postUpdates).forEach((update) => update());
 	};
 
-	const ANIMATIONS = {
-		walk: {
-			up: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(8 * 12, 8 * 12 + 8),
-				WALK_ANIMATION_SPEED
-			),
-			left: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(9 * 12, 9 * 12 + 8),
-				WALK_ANIMATION_SPEED
-			),
-			down: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(10 * 12, 10 * 12 + 8),
-				WALK_ANIMATION_SPEED
-			),
-			right: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(11 * 12, 11 * 12 + 8),
-				WALK_ANIMATION_SPEED
-			),
-		},
-		idle: {
-			up: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(8 * 12, 8 * 12 + 1),
-				IDLE_ANIMATION_SPEED
-			),
-			left: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(9 * 12, 9 * 12 + 1),
-				IDLE_ANIMATION_SPEED
-			),
-			down: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(10 * 12, 10 * 12 + 1),
-				IDLE_ANIMATION_SPEED
-			),
-			right: Animation.fromSpriteSheet(
-				spriteSheet,
-				range(11 * 12, 11 * 12 + 1),
-				IDLE_ANIMATION_SPEED
-			),
-		},
-	};
-
 	directions.forEach((direction) => {
-		actor.graphics.add(`walk_${direction}`, ANIMATIONS.walk[direction]);
-		actor.graphics.add(`idle_${direction}`, ANIMATIONS.idle[direction]);
+		actor.graphics.add(
+			`walk_${direction}`,
+			ANIMATIONS(spriteData?.spriteSheet).walk[direction]
+		);
+		actor.graphics.add(
+			`idle_${direction}`,
+			ANIMATIONS(spriteData?.spriteSheet).idle[direction]
+		);
 	});
 
 	actor.graphics.use(`idle_down`);

@@ -8,6 +8,7 @@ import {
 	vec,
 	Vector,
 } from "excalibur";
+import { createSignal } from "solid-js";
 
 export const drawLine = (
 	game: Engine,
@@ -70,6 +71,8 @@ export const getDimensions = (selectionRect: Actor, lines: Line[]) => {
 };
 
 export const generateSelectionRect = (game: Engine) => {
+	const [isDragging, setIsDragging] = createSignal(false);
+
 	const lines = [
 		new Line({
 			start: vec(0, 0),
@@ -141,5 +144,7 @@ export const generateSelectionRect = (game: Engine) => {
 		rect,
 		setDimensions,
 		getDimensions: () => getDimensions(selectionRect, lines),
+		isDragging,
+		setIsDragging,
 	};
 };
