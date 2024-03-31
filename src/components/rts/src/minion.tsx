@@ -2,10 +2,13 @@ import {
 	Actor,
 	ActorArgs,
 	Animation,
+	Collider,
+	CollisionContact,
 	CollisionType,
 	Engine,
 	Entity,
 	range,
+	Side,
 	SpriteSheet,
 	vec,
 	Vector,
@@ -18,14 +21,7 @@ import { Direction, directions } from "./utils/mathUtils";
 import { Action } from "./minionActions";
 import { ButtonUI, HealthBarUI } from "./Ui/minionUI";
 import { SelectableActor } from "./selectableActor";
-
-export type State = {
-	direction: Direction;
-	action: Action;
-	destination: Vector;
-	postUpdates: Record<string, () => void>;
-	pos: Vector;
-};
+import { DestinationIndicator } from "./utils/graphicsUtils";
 
 const spriteSheet_COLUMNS = 12;
 const spriteSheet_ROWS = 21;
@@ -100,9 +96,18 @@ const ANIMATIONS = (spriteSheet: SpriteSheet = defaultSpriteSheet) => ({
 export const isMinion = (entity: Entity): entity is Minion =>
 	entity instanceof Minion;
 
+export type State = {
+	direction: Direction;
+	action: Action;
+	destination: Vector;
+	postUpdates: Record<string, () => void>;
+	pos: Vector;
+};
+
 export class Minion extends SelectableActor {
 	state: Accessor<State>;
 	setState: Setter<State>;
+	destinationIndicator: DestinationIndicator;
 
 	constructor(
 		config: { pos: Vector } & ActorArgs,
@@ -115,14 +120,16 @@ export class Minion extends SelectableActor {
 	) {
 		super({
 			...config,
+			radius: (spriteData?.spriteWidth ?? sprite_WIDTH) / 2,
 			width: spriteData?.spriteWidth ?? sprite_WIDTH,
 			height:
 				spriteData?.spriteHeight ??
 				sprite_HEIGHT +
 					(spriteData?.spriteMargin?.y ?? sprite_MARGIN.y),
 		});
+
 		this.addTag("minion");
-    this.body.collisionType = CollisionType.Active;
+		this.body.collisionType = CollisionType.Active;
 
 		const [state, setState] = createSignal<State>({
 			direction: "down",
@@ -139,6 +146,7 @@ export class Minion extends SelectableActor {
 		});
 		this.state = state;
 		this.setState = setState;
+		this.destinationIndicator = new DestinationIndicator(state);
 
 		directions.forEach((direction) => {
 			this.graphics.add(
@@ -156,6 +164,9 @@ export class Minion extends SelectableActor {
 
 	onInitialize(engine: Engine<any>): void {
 		super.onInitialize(engine);
+
+		engine.add(this.destinationIndicator);
+
 		render(
 			() => (
 				<HealthBarUI state={this.state} actor={this} engine={engine} />
@@ -168,74 +179,16 @@ export class Minion extends SelectableActor {
 		super.onPostUpdate(engine, delta);
 
 		this.graphics.use(`${this.state().action}_${this.state().direction}`);
+
+		if (this.pos.distance(this.state().destination) >= this.width / 2) {
+			const pointerVec = this.state()
+				.destination.sub(this.pos)
+				.normalize();
+			this.vel = pointerVec.clone().scale(100);
+		}
+
 		this.setState((prev) => ({ ...prev, pos: this.pos }));
 
 		Object.values(this.state().postUpdates).forEach((update) => update());
 	}
 }
-
-export const createMinion = async (
-	game: Engine,
-	spriteData?: {
-		spriteSheet?: SpriteSheet;
-		spriteWidth?: number;
-		spriteHeight?: number;
-		spriteMargin?: { x: number; y: number };
-	}
-) => {
-	const actor = new SelectableActor({
-		// pos: vec(game.halfCanvasWidth, game.halfCanvasHeight),
-		x: game.halfCanvasWidth,
-		y: game.halfCanvasHeight,
-		width: spriteData?.spriteWidth ?? sprite_WIDTH,
-		height:
-			spriteData?.spriteHeight ??
-			sprite_HEIGHT + (spriteData?.spriteMargin?.y ?? sprite_MARGIN.y),
-	});
-
-	actor.addTag("minion");
-
-	const [state, setState] = createSignal<State>({
-		direction: "down",
-		action: "idle",
-		destination: actor.pos.clone(),
-		postUpdates: {},
-		pos: actor.pos,
-	});
-
-	actor.onPostUpdate = (engine: Engine, delta: number) => {
-		setState((prev) => ({ ...prev }));
-		Object.values(state().postUpdates).forEach((update) => update());
-	};
-
-	directions.forEach((direction) => {
-		actor.graphics.add(
-			`walk_${direction}`,
-			ANIMATIONS(spriteData?.spriteSheet).walk[direction]
-		);
-		actor.graphics.add(
-			`idle_${direction}`,
-			ANIMATIONS(spriteData?.spriteSheet).idle[direction]
-		);
-	});
-
-	actor.graphics.use(`idle_down`);
-
-	createEffect(() => {
-		actor.graphics.use(`${state().action}_${state().direction}`);
-	});
-
-	game.add(actor);
-
-	render(
-		() => <ButtonUI state={state} setState={setState} />,
-		document.getElementById(gameUiId)!
-	);
-
-	render(
-		() => <HealthBarUI state={state} actor={actor} engine={game} />,
-		document.getElementById(gameUiId)!
-	);
-
-	return { actor, state, setState };
-};

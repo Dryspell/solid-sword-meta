@@ -1,9 +1,8 @@
-import { DisplayMode, Engine, vec } from "excalibur";
-import { gameCanvasId, gameUiId } from "../Entry";
+import { Debug, DisplayMode, Engine, vec } from "excalibur";
+import { gameCanvasId } from "../Entry";
 import { generateSelectionRect } from "./utils/graphicsUtils";
-import { createMinion, isMinion, Minion } from "./minion";
+import { isMinion, Minion } from "./minion";
 import { loader } from "./resources";
-import { handleWalk } from "./minionActions";
 import { assignDestinations, isWithinRect } from "./utils/mathUtils";
 import { isSelectable } from "./selectableActor";
 
@@ -19,8 +18,10 @@ export default function initializeGame() {
 		},
 	});
 
+	// game.debug.collider.showAll = true;
+	// game.debug.entity.showId = true;
+	// game.toggleDebug();
 	game.start(loader).then(async () => {
-		// const player = await createMinion(game);
 		const minions = Array.from({ length: 10 }, (_, i) => {
 			const minion = new Minion({
 				pos: vec(
@@ -35,8 +36,6 @@ export default function initializeGame() {
 		const unitSelector = generateSelectionRect(game);
 
 		game.input.pointers.on("down", (pointerEvent) => {
-			// console.log("pointerEvent", pointerEvent);
-
 			if (pointerEvent.button === "Left") {
 				unitSelector.setIsDragging(true);
 				unitSelector.selectionRect.pos =
@@ -79,7 +78,6 @@ export default function initializeGame() {
 						if (!isSelectable(ent)) return false;
 						const dimensions = unitSelector.getDimensions();
 
-						console.log(ent, ent.pos);
 						const withinRect = isWithinRect(ent.pos, dimensions);
 						if (withinRect) {
 							ent.setSelected(true);
@@ -91,8 +89,6 @@ export default function initializeGame() {
 				console.log({ selectedActors });
 			}
 		});
-
-		// game.input.pointers.
 	});
 
 	return game;
