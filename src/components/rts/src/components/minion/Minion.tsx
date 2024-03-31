@@ -15,13 +15,13 @@ import {
 } from "excalibur";
 import { Accessor, createEffect, createSignal, Setter } from "solid-js";
 import { render } from "solid-js/web";
-import { gameUiId } from "../Entry";
-import { Resources } from "./resources";
-import { Direction, directions } from "./utils/mathUtils";
+import { gameUiId } from "../../../Entry";
+import { Resources } from "../../resources";
+import { Direction, directions } from "../../utils/mathUtils";
 import { Action } from "./minionActions";
-import { ButtonUI, HealthBarUI } from "./Ui/minionUI";
-import { SelectableActor } from "./selectableActor";
-import { DestinationIndicator } from "./utils/graphicsUtils";
+import { SelectableActor } from "../SelectableActor";
+import { DestinationIndicator } from "./DestinationIndicator";
+import { HealthBarUI } from "./minionUI";
 
 const spriteSheet_COLUMNS = 12;
 const spriteSheet_ROWS = 21;

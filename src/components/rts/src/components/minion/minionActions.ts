@@ -1,6 +1,6 @@
 import { Vector } from "excalibur";
-import { Minion } from "./minion";
-import { getDirection4 } from "./utils/mathUtils";
+import { Minion } from "./Minion";
+import { getDirection4 } from "../../utils/mathUtils";
 
 export const actions = ["idle", "walk"] as const;
 export type Action = (typeof actions)[number];

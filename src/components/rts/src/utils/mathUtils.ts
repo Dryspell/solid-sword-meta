@@ -1,7 +1,7 @@
 import { vec, Vector } from "excalibur";
 import { getDimensions } from "./graphicsUtils";
-import { Minion } from "../minion";
-import { handleWalk } from "../minionActions";
+import { Minion } from "../components/minion/Minion";
+import { handleWalk } from "../components/minion/minionActions";
 
 export const directions = ["up", "right", "down", "left"] as const;
 export type Direction = (typeof directions)[number];

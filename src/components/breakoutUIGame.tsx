@@ -279,7 +279,6 @@ export default function Game() {
 			<canvas id={gameCanvasId}></canvas>
 			<div
 				id={gameUiId}
-				// style={{ position: "absolute", display: "flex", width: "100%" }}
 			/>
 		</div>
 	);

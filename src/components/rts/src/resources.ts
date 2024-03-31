@@ -10,8 +10,12 @@ export const Resources = {
 	),
 } as const;
 
-export const loader = new Loader();
+export const createLoader = () => {
+	const loader = new Loader();
 
-for (let res of Object.values(Resources)) {
-	loader.addResource(res);
-}
+	for (let res of Object.values(Resources)) {
+		loader.addResource(res);
+	}
+
+	return loader;
+};

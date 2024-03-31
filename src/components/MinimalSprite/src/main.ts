@@ -25,6 +25,6 @@ export default function initializeGame() {
 	game.add(unit);
 
 	game.start(loader).then(() => {
-		// game.goToScene(level1.name);
+		console.log("Game started");
 	});
 }

@@ -8,11 +8,11 @@ import {
 	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { State } from "../minion";
+import { State } from "./Minion";
 import { Progress } from "~/components/ui/progress";
 import { Actor, Engine } from "excalibur";
-import { getUiPosByTopLeft } from "../utils/UiUtils";
-import { isSelectable } from "../selectableActor";
+import { getUiPosByTopLeft } from "../../utils/UiUtils";
+import { isSelectable } from "../SelectableActor";
 
 export const ButtonUI = ({
 	state,
