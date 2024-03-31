@@ -185,6 +185,8 @@ export class Minion extends SelectableActor {
 				.destination.sub(this.pos)
 				.normalize();
 			this.vel = pointerVec.clone().scale(100);
+		} else {
+			this.vel = Vector.Zero;
 		}
 
 		this.setState((prev) => ({ ...prev, pos: this.pos }));
