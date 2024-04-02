@@ -1,19 +1,19 @@
 import {
-	Actor,
 	type ActorArgs,
 	Animation,
-	Collider,
-	CollisionContact,
 	CollisionType,
 	type Engine,
 	type Entity,
 	range,
-	Side,
 	SpriteSheet,
 	vec,
 	Vector,
 } from "excalibur";
-import { type Accessor, createEffect, createSignal, type Setter } from "solid-js";
+import {
+	type Accessor,
+	createSignal,
+	type Setter,
+} from "solid-js";
 import { render } from "solid-js/web";
 import { gameUiId } from "../../../Entry";
 import { Resources } from "../../resources";
@@ -131,22 +131,34 @@ export class Minion extends SelectableActor {
 		this.addTag("minion");
 		this.body.collisionType = CollisionType.Active;
 
-		const [state, setState] = createSignal<State>({
-			direction: "down",
-			action: "idle",
-			destination:
-				config.pos?.clone() ??
-				((config?.x && config?.y && vec(config.x, config.y)) ||
-					vec(0, 0)),
-			postUpdates: {},
-			pos:
-				config.pos?.clone() ??
-				((config?.x && config?.y && vec(config.x, config.y)) ||
-					vec(0, 0)),
-		});
+		const [state, setState] = createSignal<State>(
+			{
+				direction: "down",
+				action: "idle",
+				destination:
+					config.pos?.clone() ??
+					((config?.x && config?.y && vec(config.x, config.y)) ||
+						vec(0, 0)),
+				postUpdates: {},
+				pos:
+					config.pos?.clone() ??
+					((config?.x && config?.y && vec(config.x, config.y)) ||
+						vec(0, 0)),
+			}
+			// { equals: false }
+		);
 		this.state = state;
 		this.setState = setState;
 		this.destinationIndicator = new DestinationIndicator(state);
+
+		// const [position, setPosition] = createSignal<Vector>(
+		// 	config.pos?.clone() ??
+		// 		((config?.x && config?.y && vec(config.x, config.y)) ||
+		// 			vec(0, 0)),
+		// 	{ equals: false }
+		// );
+		// this.position = position;
+		// this.setPosition = setPosition;
 
 		directions.forEach((direction) => {
 			this.graphics.add(
@@ -180,7 +192,7 @@ export class Minion extends SelectableActor {
 
 		this.graphics.use(`${this.state().action}_${this.state().direction}`);
 
-		if (this.pos.distance(this.state().destination) >= this.width / 2) {
+		if (this.pos.distance(this.state().destination) >= this.width / 2 ) {
 			const pointerVec = this.state()
 				.destination.sub(this.pos)
 				.normalize();
@@ -189,7 +201,15 @@ export class Minion extends SelectableActor {
 			this.vel = Vector.Zero;
 		}
 
-		this.setState((prev) => ({ ...prev, pos: this.pos }));
+		this.setState((prev) => ({
+			...prev,
+			pos: this.pos,
+		}));
+
+		// this.setState((prev) => {
+		// 	prev.pos = this.pos;
+		// 	return prev;
+		// });
 
 		Object.values(this.state().postUpdates).forEach((update) => update());
 	}

@@ -1,16 +1,17 @@
-import { Debug, DisplayMode, Engine, vec } from "excalibur";
+import { Color, Debug, DisplayMode, Engine, vec } from "excalibur";
 import { gameCanvasId } from "../Entry";
 import { isMinion, Minion } from "./components/minion/Minion";
 import { createLoader } from "./resources";
 import { assignDestinations } from "./utils/mathUtils";
 import { generateSelectionRect } from "./components/UnitSelector";
+import { cameraControls } from "./components/Camera";
 
 const PADDING = 50;
 
 export default function initializeGame() {
 	const game = new Engine({
 		canvasElementId: gameCanvasId,
-		displayMode: DisplayMode.FitContainerAndFill,
+		displayMode: DisplayMode.FillContainer,
 		pixelArt: true,
 		pixelRatio: 2,
 		suppressHiDPIScaling: true,
@@ -23,10 +24,12 @@ export default function initializeGame() {
 
 	// game.debug.collider.showAll = true;
 	// game.debug.entity.showId = true;
-	// game.toggleDebug();
+	game.toggleDebug();
 
 	game.start(loader).then(async () => {
-		const minions = Array.from({ length: 10 }, (_, i) => {
+		console.log(game.canvasWidth, game.canvasHeight);
+
+		const minions = Array.from({ length: 20 }, (_, i) => {
 			const minion = new Minion({
 				pos: vec(
 					PADDING + Math.random() * (game.canvasWidth - 2 * PADDING),
@@ -54,6 +57,8 @@ export default function initializeGame() {
 				);
 			}
 		});
+
+		cameraControls(game);
 	});
 
 	return game;
