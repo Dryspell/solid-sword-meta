@@ -1,19 +1,18 @@
 import {
 	type ActorArgs,
 	Animation,
+	type Collider,
+	type CollisionContact,
 	CollisionType,
 	type Engine,
 	type Entity,
 	range,
+	type Side,
 	SpriteSheet,
 	vec,
-	Vector,
+	type Vector,
 } from "excalibur";
-import {
-	type Accessor,
-	createSignal,
-	type Setter,
-} from "solid-js";
+import { type Accessor, createSignal, type Setter } from "solid-js";
 import { render } from "solid-js/web";
 import { gameUiId } from "../../../Entry";
 import { Resources } from "../../resources";
@@ -21,7 +20,7 @@ import { type Direction, directions } from "../../utils/mathUtils";
 import { type Action } from "./minionActions";
 import { SelectableActor } from "../SelectableActor";
 import { DestinationIndicator } from "./DestinationIndicator";
-import { HealthBarUI } from "./HealthBarUI";
+import { MinionAboveHeadBars } from "./MinionAboveHeadBarsUI";
 
 const spriteSheet_COLUMNS = 12;
 const spriteSheet_ROWS = 21;
@@ -96,17 +95,30 @@ const ANIMATIONS = (spriteSheet: SpriteSheet = defaultSpriteSheet) => ({
 export const isMinion = (entity: Entity): entity is Minion =>
 	entity instanceof Minion;
 
-export type State = {
+export type UnitState = {
 	direction: Direction;
 	action: Action;
 	destination: Vector;
-	postUpdates: Record<string, () => void>;
+	work: number;
+	harvestWork: number;
 	pos: Vector;
+	postUpdates: Record<string, () => void>;
+	collisionActions: Record<
+		string,
+		(
+			self: Collider,
+			other: Collider,
+			side: Side,
+			contact: CollisionContact
+		) => void
+	>;
+	hp: number;
+	maxHp: number;
 };
 
 export class Minion extends SelectableActor {
-	state: Accessor<State>;
-	setState: Setter<State>;
+	state: Accessor<UnitState>;
+	setState: Setter<UnitState>;
 	destinationIndicator: DestinationIndicator;
 
 	constructor(
@@ -131,7 +143,7 @@ export class Minion extends SelectableActor {
 		this.addTag("minion");
 		this.body.collisionType = CollisionType.Active;
 
-		const [state, setState] = createSignal<State>(
+		const [state, setState] = createSignal<UnitState>(
 			{
 				direction: "down",
 				action: "idle",
@@ -139,11 +151,16 @@ export class Minion extends SelectableActor {
 					config.pos?.clone() ??
 					((config?.x && config?.y && vec(config.x, config.y)) ||
 						vec(0, 0)),
-				postUpdates: {},
 				pos:
 					config.pos?.clone() ??
 					((config?.x && config?.y && vec(config.x, config.y)) ||
 						vec(0, 0)),
+				postUpdates: {},
+				work: 0,
+				harvestWork: 1,
+				collisionActions: {},
+				hp: 100,
+				maxHp: 100,
 			}
 			// { equals: false }
 		);
@@ -181,36 +198,34 @@ export class Minion extends SelectableActor {
 
 		render(
 			() => (
-				<HealthBarUI state={this.state} actor={this} engine={engine} />
+				<MinionAboveHeadBars
+					state={this.state}
+					actor={this}
+					engine={engine}
+				/>
 			),
 			document.getElementById(gameUiId)!
+		);
+	}
+
+	onCollisionStart(
+		self: Collider,
+		other: Collider,
+		side: Side,
+		contact: CollisionContact
+	): void {
+		Object.values(this.state().collisionActions).forEach(
+			(collisionAction) => collisionAction(self, other, side, contact)
 		);
 	}
 
 	onPostUpdate(engine: Engine, delta: number) {
 		super.onPostUpdate(engine, delta);
 
-		this.graphics.use(`${this.state().action}_${this.state().direction}`);
-
-		if (this.pos.distance(this.state().destination) >= this.width / 2 ) {
-			const pointerVec = this.state()
-				.destination.sub(this.pos)
-				.normalize();
-			this.vel = pointerVec.clone().scale(100);
-		} else {
-			this.vel = Vector.Zero;
-		}
-
-		this.setState((prev) => ({
-			...prev,
-			pos: this.pos,
-		}));
-
-		// this.setState((prev) => {
-		// 	prev.pos = this.pos;
-		// 	return prev;
-		// });
-
-		Object.values(this.state().postUpdates).forEach((update) => update());
+		const postUpdates = Object.values(this.state().postUpdates);
+		(postUpdates.length
+			? postUpdates
+			: [() => this.setState((prev) => ({ ...prev }))]
+		).forEach((update) => update());
 	}
 }

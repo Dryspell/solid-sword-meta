@@ -1,6 +1,6 @@
 import { Actor, Circle, Color, type Engine, Line, Vector } from "excalibur";
 import { type Accessor, createEffect } from "solid-js";
-import { type State } from "./Minion";
+import { type UnitState } from "./Minion";
 
 export class DestinationIndicator extends Actor {
 	lineGraphic: Line;
@@ -8,7 +8,7 @@ export class DestinationIndicator extends Actor {
 	circleGraphic: Circle;
 	targetCircle: Actor;
 
-	constructor(state: Accessor<State>) {
+	constructor(state: Accessor<UnitState>) {
 		super({
 			pos: state().pos,
 			anchor: Vector.Half,

@@ -1,12 +1,12 @@
 import { type Accessor } from "solid-js";
-import { type State } from "./Minion";
+import { type UnitState } from "./Minion";
 import { Progress } from "~/components/ui/progress";
 import { type Actor, type Engine } from "excalibur";
 import { getUiPosByTopLeft } from "../../utils/UiUtils";
 import { isSelectable } from "../SelectableActor";
 
-export const HealthBarUI = (props: {
-	state: Accessor<State>;
+export const MinionAboveHeadBars = (props: {
+	state: Accessor<UnitState>;
 	actor: Actor;
 	engine: Engine;
 }) => {
@@ -26,12 +26,24 @@ export const HealthBarUI = (props: {
 		>
 			{isSelectable(props.actor) && props.actor.selected() && (
 				<Progress
-					value={60}
+					value={props.state().hp}
 					minValue={0}
-					maxValue={100}
+					maxValue={props.state().maxHp}
 					style={{
 						width: `${props.actor.width}px`,
 					}}
+					color="bg-red-500"
+				/>
+			)}
+			{props.state().action === "harvest" && (
+				<Progress
+					value={props.state().work}
+					minValue={0}
+					maxValue={props.state().harvestWork}
+					style={{
+						width: `${props.actor.width}px`,
+					}}
+					color="bg-yellow-500"
 				/>
 			)}
 		</div>
