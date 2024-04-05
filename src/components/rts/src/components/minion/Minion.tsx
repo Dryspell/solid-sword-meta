@@ -46,6 +46,28 @@ const WALK_ANIMATION_SPEED = 100;
 const IDLE_ANIMATION_SPEED = 200;
 
 const ANIMATIONS = (spriteSheet: SpriteSheet = defaultSpriteSheet) => ({
+	harvest: {
+		up: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(4 * 12, 4 * 12 + 7),
+			WALK_ANIMATION_SPEED
+		),
+		left: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(5 * 12, 5 * 12 + 7),
+			WALK_ANIMATION_SPEED
+		),
+		down: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(6 * 12, 6 * 12 + 7),
+			WALK_ANIMATION_SPEED
+		),
+		right: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(7 * 12, 7 * 12 + 7),
+			WALK_ANIMATION_SPEED
+		),
+	},
 	walk: {
 		up: Animation.fromSpriteSheet(
 			spriteSheet,
@@ -120,6 +142,7 @@ export class Minion extends SelectableActor {
 	state: Accessor<UnitState>;
 	setState: Setter<UnitState>;
 	destinationIndicator: DestinationIndicator;
+	disposeUI?: () => void;
 
 	constructor(
 		config: { pos: Vector } & ActorArgs,
@@ -186,6 +209,10 @@ export class Minion extends SelectableActor {
 				`idle_${direction}`,
 				ANIMATIONS(spriteData?.spriteSheet).idle[direction]
 			);
+			this.graphics.add(
+				`harvest_${direction}`,
+				ANIMATIONS(spriteData?.spriteSheet).harvest[direction]
+			);
 		});
 
 		this.graphics.use("idle_down");
@@ -196,7 +223,7 @@ export class Minion extends SelectableActor {
 
 		engine.add(this.destinationIndicator);
 
-		render(
+		this.disposeUI = render(
 			() => (
 				<MinionAboveHeadBars
 					state={this.state}

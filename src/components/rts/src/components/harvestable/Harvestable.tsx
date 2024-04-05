@@ -1,12 +1,9 @@
 import {
 	type ActorArgs,
-	Animation,
 	CollisionType,
 	type Engine,
-	type Entity,
-	range,
+	type Scene,
 	type SpriteSheet,
-	vec,
 	Vector,
 } from "excalibur";
 import { type Accessor, createSignal, type Setter } from "solid-js";
@@ -33,6 +30,7 @@ export class HarvestableResource extends SelectableActor {
 	resourceType: ResourceType;
 	harvestRate: number;
 	harvestWork: number;
+	disposeUI?: () => void;
 	state: Accessor<ResourceState>;
 	setState: Setter<ResourceState>;
 
@@ -81,7 +79,11 @@ export class HarvestableResource extends SelectableActor {
 
 	onInitialize(engine: Engine<any>): void {
 		super.onInitialize(engine);
-		render(
+
+		const ui = document
+			.getElementById(gameUiId)!
+			.appendChild(document.createElement("div"));
+		this.disposeUI = render(
 			() => (
 				<HarvestableAboveBars
 					state={this.state}
@@ -89,11 +91,16 @@ export class HarvestableResource extends SelectableActor {
 					engine={engine}
 				/>
 			),
-			document.getElementById(gameUiId)!
+			ui
 		);
 	}
 
 	onPostUpdate(engine: Engine, delta: number) {
 		this.setState((prev) => ({ ...prev }));
+	}
+
+	onPostKill(scene: Scene<unknown>): void {
+		super.onPostKill(scene);
+		this.disposeUI?.();
 	}
 }

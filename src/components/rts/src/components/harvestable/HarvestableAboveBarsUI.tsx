@@ -2,7 +2,6 @@ import { type Accessor } from "solid-js";
 import { Progress } from "~/components/ui/progress";
 import { type Actor, type Engine } from "excalibur";
 import { getUiPosByTopLeft } from "../../utils/UiUtils";
-import { isSelectable } from "../SelectableActor";
 import { type ResourceState } from "./Harvestable";
 
 export const HarvestableAboveBars = (props: {

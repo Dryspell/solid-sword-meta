@@ -1,9 +1,4 @@
-import {
-	type Collider,
-	type CollisionContact,
-	type Side,
-	Vector,
-} from "excalibur";
+import { type Collider, Vector } from "excalibur";
 import { type Minion } from "./Minion";
 import { getDirection4 } from "../../utils/mathUtils";
 import { type HarvestableResource } from "../harvestable/Harvestable";
@@ -77,38 +72,71 @@ export const harvestResource = (
 				walk: generatePostUpdateWalk(minion),
 			},
 			collisionActions: {
-				harvest: (
-					self: Collider,
-					other: Collider,
-				) => {
+				harvest: (self: Collider, other: Collider) => {
 					console.log(other.owner);
 					if (other.owner === resource) {
-						console.log("harvesting");
 						minion.vel = Vector.Zero;
 						minion.destinationIndicator.hide();
 						const { walk, ...postUpdates } =
 							minion.state().postUpdates;
+						const { harvest, ...collisionActions } =
+							minion.state().collisionActions;
 						minion.setState((prev) => ({
 							...prev,
 							work: 0,
 							harvestWork: resource.harvestWork,
 							action: "harvest",
+							collisionActions,
 							postUpdates: {
 								...postUpdates,
 								harvest: () => {
+									if (resource.isKilled()) {
+										minion.setState((prev) => ({
+											...prev,
+											action: "idle",
+											work: 0,
+											harvestWork: 1,
+											postUpdates: {},
+										}));
+										minion.graphics.use(
+											`${minion.state().action}_${
+												minion.state().direction
+											}`
+										);
+										return;
+									}
+
 									if (
 										minion.state().work >=
 										resource.harvestWork
 									) {
-										resource.setState((prev) => ({
-											...prev,
-											amountRemaining:
-												prev.amountRemaining - 1,
-										}));
-										minion.setState((prev) => ({
-											...prev,
-											work: 0,
-										}));
+										if (
+											resource.state().amountRemaining > 0
+										) {
+											resource.setState((prev) => ({
+												...prev,
+												amountRemaining:
+													prev.amountRemaining - 1,
+											}));
+											minion.setState((prev) => ({
+												...prev,
+												work: 0,
+											}));
+										} else {
+											resource.kill();
+											minion.setState((prev) => ({
+												...prev,
+												action: "idle",
+												work: 0,
+												harvestWork: 1,
+												postUpdates: {},
+											}));
+											minion.graphics.use(
+												`${minion.state().action}_${
+													minion.state().direction
+												}`
+											);
+										}
 									} else
 										minion.setState((prev) => ({
 											...prev,
@@ -117,6 +145,11 @@ export const harvestResource = (
 								},
 							},
 						}));
+						minion.graphics.use(
+							`${minion.state().action}_${
+								minion.state().direction
+							}`
+						);
 					}
 				},
 			},

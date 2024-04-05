@@ -63,7 +63,7 @@ export default function initializeGame() {
 							Math.random() * (game.canvasHeight - 2 * PADDING)
 					),
 				},
-				{ resourceType: "iron", maxAmount: 100 }
+				{ resourceType: "iron", maxAmount: 15 }
 			);
 
 			game.add(harvestable);
