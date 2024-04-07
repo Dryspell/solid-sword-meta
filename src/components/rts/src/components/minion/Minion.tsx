@@ -4,6 +4,7 @@ import {
 	type Collider,
 	type CollisionContact,
 	CollisionType,
+	Color,
 	type Engine,
 	type Entity,
 	range,
@@ -20,7 +21,9 @@ import { type Direction, directions } from "../../utils/mathUtils";
 import { type Action } from "./minionActions";
 import { SelectableActor } from "../SelectableActor";
 import { DestinationIndicator } from "./DestinationIndicator";
-import { MinionAboveHeadBars } from "./MinionAboveHeadBarsUI";
+import { MinionOverlayUI } from "./MinionOverlayUI";
+import { type Player } from "../../main";
+import { randFirstName } from "@ngneat/falso";
 
 const spriteSheet_COLUMNS = 12;
 const spriteSheet_ROWS = 21;
@@ -46,6 +49,28 @@ const WALK_ANIMATION_SPEED = 100;
 const IDLE_ANIMATION_SPEED = 200;
 
 const ANIMATIONS = (spriteSheet: SpriteSheet = defaultSpriteSheet) => ({
+	combat: {
+		up: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(12 * 12, 12 * 12 + 5),
+			WALK_ANIMATION_SPEED
+		),
+		left: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(13 * 12, 13 * 12 + 5),
+			WALK_ANIMATION_SPEED
+		),
+		down: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(14 * 12, 14 * 12 + 5),
+			WALK_ANIMATION_SPEED
+		),
+		right: Animation.fromSpriteSheet(
+			spriteSheet,
+			range(15 * 12, 15 * 12 + 5),
+			WALK_ANIMATION_SPEED
+		),
+	},
 	harvest: {
 		up: Animation.fromSpriteSheet(
 			spriteSheet,
@@ -123,6 +148,10 @@ export type UnitState = {
 	destination: Vector;
 	work: number;
 	harvestWork: number;
+	attackProgress: number;
+	attackSpeed: number;
+	attackDamage: [number, number];
+	attackRange: number;
 	pos: Vector;
 	postUpdates: Record<string, () => void>;
 	collisionActions: Record<
@@ -143,28 +172,34 @@ export class Minion extends SelectableActor {
 	setState: Setter<UnitState>;
 	destinationIndicator: DestinationIndicator;
 	disposeUI?: () => void;
+	owner: Player;
+	name: string = randFirstName();
 
 	constructor(
 		config: { pos: Vector } & ActorArgs,
-		spriteData?: {
-			spriteSheet?: SpriteSheet;
-			spriteWidth?: number;
-			spriteHeight?: number;
-			spriteMargin?: { x: number; y: number };
-		}
+		owner: Player,
+		options: {
+			spriteData?: {
+				spriteSheet?: SpriteSheet;
+				spriteWidth?: number;
+				spriteHeight?: number;
+				spriteMargin?: { x: number; y: number };
+			};
+		} = {}
 	) {
 		super({
 			...config,
-			radius: (spriteData?.spriteWidth ?? sprite_WIDTH) / 2,
-			width: spriteData?.spriteWidth ?? sprite_WIDTH,
+			radius: (options.spriteData?.spriteWidth ?? sprite_WIDTH) / 2,
+			width: options.spriteData?.spriteWidth ?? sprite_WIDTH,
 			height:
-				spriteData?.spriteHeight ??
+				options.spriteData?.spriteHeight ??
 				sprite_HEIGHT +
-					(spriteData?.spriteMargin?.y ?? sprite_MARGIN.y),
+					(options.spriteData?.spriteMargin?.y ?? sprite_MARGIN.y),
 		});
 
 		this.addTag("minion");
 		this.body.collisionType = CollisionType.Active;
+		this.owner = owner;
 
 		const [state, setState] = createSignal<UnitState>(
 			{
@@ -184,6 +219,10 @@ export class Minion extends SelectableActor {
 				collisionActions: {},
 				hp: 100,
 				maxHp: 100,
+				attackProgress: 0,
+				attackSpeed: 150,
+				attackDamage: [2, 7],
+				attackRange: this.width * 2,
 			}
 			// { equals: false }
 		);
@@ -191,29 +230,17 @@ export class Minion extends SelectableActor {
 		this.setState = setState;
 		this.destinationIndicator = new DestinationIndicator(state);
 
-		// const [position, setPosition] = createSignal<Vector>(
-		// 	config.pos?.clone() ??
-		// 		((config?.x && config?.y && vec(config.x, config.y)) ||
-		// 			vec(0, 0)),
-		// 	{ equals: false }
-		// );
-		// this.position = position;
-		// this.setPosition = setPosition;
-
-		directions.forEach((direction) => {
-			this.graphics.add(
-				`walk_${direction}`,
-				ANIMATIONS(spriteData?.spriteSheet).walk[direction]
-			);
-			this.graphics.add(
-				`idle_${direction}`,
-				ANIMATIONS(spriteData?.spriteSheet).idle[direction]
-			);
-			this.graphics.add(
-				`harvest_${direction}`,
-				ANIMATIONS(spriteData?.spriteSheet).harvest[direction]
-			);
-		});
+		Object.entries(ANIMATIONS(options.spriteData?.spriteSheet)).forEach(
+			([animationAction, animationsByDirection]) =>
+				directions.forEach((direction) => {
+					const animation = animationsByDirection[direction];
+					animation.tint = owner.teamColor;
+					this.graphics.add(
+						`${animationAction}_${direction}`,
+						animation
+					);
+				})
+		);
 
 		this.graphics.use("idle_down");
 	}
@@ -225,7 +252,7 @@ export class Minion extends SelectableActor {
 
 		this.disposeUI = render(
 			() => (
-				<MinionAboveHeadBars
+				<MinionOverlayUI
 					state={this.state}
 					actor={this}
 					engine={engine}

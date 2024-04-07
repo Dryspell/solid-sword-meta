@@ -7,9 +7,11 @@ import {
 	vec,
 	Vector,
 } from "excalibur";
-import { createSignal } from "solid-js";
+import { type Accessor, createSignal } from "solid-js";
 import { isSelectable } from "./SelectableActor";
 import { isWithinRect } from "../utils/mathUtils";
+import { type GameState } from "../main";
+import { isMinion } from "./minion/Minion";
 
 export const getDimensions = (selectionRect: Actor, lines: Line[]) => {
 	return {
@@ -20,7 +22,10 @@ export const getDimensions = (selectionRect: Actor, lines: Line[]) => {
 	};
 };
 
-export const generateSelectionRect = (game: Engine) => {
+export const generateSelectionRect = (
+	game: Engine,
+	gameState: Accessor<GameState>
+) => {
 	const [isDragging, setIsDragging] = createSignal(false);
 
 	const lines = [
@@ -111,6 +116,12 @@ export const generateSelectionRect = (game: Engine) => {
 				.queryTags(["selectable"])
 				.entities.filter((ent) => {
 					if (!isSelectable(ent)) return false;
+					if (
+						isMinion(ent) &&
+						(!ent.owner || ent.owner !== gameState().activePlayer)
+					)
+						return false;
+
 					const dimensions = getDimensions(selectionRect, lines);
 
 					const withinRect = isWithinRect(ent.pos, dimensions);
